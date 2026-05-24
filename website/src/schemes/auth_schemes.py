@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr, model_validator
 from typing import Optional
-from helpers.enums import UserRoles
-
+from helpers.enums import UserType
 class studentSignupRequest(BaseModel):
     username: str
     email: EmailStr
@@ -24,5 +23,5 @@ class LoginRequest(BaseModel):
 class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    role: UserRoles
+    role: UserType
     

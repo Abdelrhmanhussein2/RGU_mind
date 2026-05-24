@@ -1,8 +1,5 @@
-from fastapi import APIRouter,FastAPI
+from fastapi import APIRouter
+from routes.auth import auth_router
 
 base_router = APIRouter()
-
-@base_router.get("/")
-def read_root():
-    return {"Hello": "World"}
-    
+base_router.include_router(auth_router, prefix="/auth")
