@@ -15,7 +15,8 @@ class universitySignupRequest(BaseModel):
     contact_email: EmailStr
     password:      str
 
-    
+
+
 class LoginRequest(BaseModel):
     email_or_username: str
     password: str
@@ -24,4 +25,3 @@ class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: UserType
-    
