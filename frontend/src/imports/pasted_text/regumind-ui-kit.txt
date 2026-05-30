@@ -1,0 +1,149 @@
+Design a modern, clean, and professional web application UI/UX for a product called "ReguMind".
+
+PROJECT OVERVIEW:
+ReguMind is an AI-powered academic assistant that helps university students understand academic regulations. It uses Retrieval-Augmented Generation (RAG) to provide accurate answers strictly based on official university regulations documents.
+
+The design should reflect:
+- Trust and reliability (since it's based on official rules)
+- Simplicity and clarity (students should not feel overwhelmed)
+- Intelligence (AI-driven system)
+- Professional academic tone (not playful or overly casual)
+
+TARGET USERS:
+- University students
+- University administrators
+
+STYLE DIRECTION:
+- Minimal, modern UI (inspired by Notion, ChatGPT, Stripe dashboards)
+- Soft colors (primary: deep blue or indigo, secondary: light gray/white)
+- Clean typography (Sans-serif, readable, modern)
+- Subtle gradients and soft shadows
+- Rounded corners
+- Plenty of white space
+- Smooth UX flow
+
+----------------------------------
+SCREENS TO DESIGN
+----------------------------------
+
+1) LANDING / ROLE SELECTION PAGE
+- Full screen hero section
+- Title: "Understand Your Academic Regulations Instantly"
+- Subtitle explaining AI assistant briefly
+- Two main selection cards/buttons:
+    a) "I am a Student"
+    b) "I am a University"
+- Each option should have icon + short description
+- Clean, centered layout
+- Background can have subtle abstract AI pattern
+
+----------------------------------
+
+2) UNIVERSITY DASHBOARD (UPLOAD PAGE)
+- Purpose: Allow universities to upload their academic regulations
+
+Components:
+- Header with logo "ReguMind"
+- Sidebar navigation:
+    - Upload Regulations
+    - Documents
+    - Settings
+
+Main content:
+- Upload area (Drag & Drop)
+- Supported files: PDF, DOCX
+- Upload progress bar
+- List of uploaded documents
+- Status indicators:
+    - Processing
+    - Completed (with green check icon)
+- Small helper text explaining that AI will process documents
+
+Optional:
+- Success animation or confirmation state
+
+----------------------------------
+
+3) STUDENT AUTHENTICATION PAGE
+- Split screen layout:
+    Left side: illustration (AI / education themed)
+    Right side: form
+
+Forms:
+- Sign In:
+    - Email
+    - Password
+    - "Forgot password?"
+- Sign Up:
+    - Name
+    - Email
+    - Password
+    - Confirm password
+
+Switch between Sign In / Sign Up
+
+CTA buttons:
+- "Continue"
+- "Create Account"
+
+----------------------------------
+
+4) STUDENT CHAT INTERFACE (MAIN PRODUCT)
+- This is the core screen
+
+Layout:
+- Left sidebar:
+    - Chat history (previous conversations)
+    - New Chat button
+- Main chat area:
+    - Messages (user vs AI)
+    - AI responses styled clearly with:
+        - Highlighted references
+        - Source citations (e.g. regulation section)
+- Input box:
+    - "Ask about your academic regulations..."
+- Send button
+
+Extra features:
+- Loading animation when AI is thinking
+- Copy response button
+- Expand source references section
+
+Design should feel similar to ChatGPT but more academic and structured.
+
+----------------------------------
+
+5) EMPTY STATE / FIRST TIME EXPERIENCE
+- Friendly message:
+  "Ask any question about your academic regulations"
+- Example prompts:
+  - "What happens if I fail a course?"
+  - "What is the maximum credit load?"
+- Clean onboarding feel
+
+----------------------------------
+
+UX DETAILS:
+- Smooth transitions between pages
+- Hover states on buttons
+- Focus states on inputs
+- Clear visual hierarchy
+- Accessibility (readable contrast)
+
+----------------------------------
+
+BRANDING:
+- App name: ReguMind
+- Tone: Smart, calm, trustworthy
+- Avoid playful or childish elements
+
+----------------------------------
+
+DELIVERABLE:
+Create a complete UI kit + all screens (desktop responsive).
+Ensure consistency in spacing, colors, typography, and components.
+
+----------------------------------
+
+GOAL:
+The final design should look like a real SaaS AI product ready for development, not just a concept.
