@@ -222,3 +222,4 @@ __marimo__/
 # Docker/local database volumes
 postgres_data/
 qdrant_data/
+frontend/node_modules/

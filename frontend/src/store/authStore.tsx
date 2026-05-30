@@ -2,7 +2,6 @@ import {
   createContext,
   useContext,
   useReducer,
-  useEffect,
   ReactNode,
 } from "react";
 import { AuthUser, getMe } from "../services/authService";
