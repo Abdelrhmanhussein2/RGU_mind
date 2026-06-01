@@ -1,6 +1,4 @@
-from fastapi import FastAPI, APIRouter , Depends
-from schemes.auth_schemes import studentSignupRequest , LoginRequest
-from controllers.auth_controller import login_controller , register_student_controller
+from fastapi import APIRouter , Depends
 from sqlalchemy.orm import Session
 from helpers.config import get_db
 from controllers.data_controller import data_controller
