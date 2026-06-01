@@ -1,0 +1,64 @@
+@baseUrl = http://127.0.0.1:5000
+@departmentId = 63bf01c6-9605-4257-a920-9cf8da913dc5
+
+### 1. Register a new student
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "username": "test_student",
+    "email": "student@example.com",
+    "password": "password123",
+    "university_name": "My University",
+    "faculty": "Engineering"
+}
+
+###
+
+### 2. Student Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email_or_username": "test_student",
+    "password": "password123"
+}
+
+###
+
+### 3. Register a new university
+POST {{baseUrl}}/auth/university/register
+Content-Type: application/json
+
+{
+    "name": "Tanta University",
+    "slug": "tanta-university",
+    "country": "Egypt",
+    "contact_email": "contact@tanta.edu.eg",
+    "password": "password123"
+}
+
+###
+
+### 4. University Login
+POST {{baseUrl}}/auth/university/login
+Content-Type: application/json
+
+{
+    "email_or_username": "tanta-university",
+    "password": "password123"
+}
+
+###
+
+### 5. Upload Regulation File
+# Replace @departmentId above with a real department id from your database.
+POST {{baseUrl}}/data/upload?department_id={{departmentId}}&title=Sample%20Regulation&version=1.0
+Content-Type: multipart/form-data; boundary=----RGUMindBoundary
+
+------RGUMindBoundary
+Content-Disposition: form-data; name="file"; filename="test_upload.txt"
+Content-Type: text/plain
+
+This is a test regulation document for the upload endpoint.
+------RGUMindBoundary--

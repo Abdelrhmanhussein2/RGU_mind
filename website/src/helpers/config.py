@@ -10,6 +10,12 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "admin123")
 POSTGRES_HOST     = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_DB       = os.getenv("POSTGRES_DB", "regumind")
 
+class Settings:
+    FILE_ALLOWED_TYPES = os.getenv("FILE_ALLOWED_TYPES", "application/pdf,text/plain").split(",")
+    FILE_MAX_SIZE_MB   = int(os.getenv("FILE_MAX_SIZE_MB", "50"))
+
+settings = Settings()
+
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}"
 
 engine = create_engine(DATABASE_URL)
