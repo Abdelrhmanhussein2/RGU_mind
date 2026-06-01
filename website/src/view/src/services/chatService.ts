@@ -18,7 +18,7 @@ export interface ChatHistoryItem {
   timestamp: string;
 }
 
-// 🔌 BACKEND: POST /chat  { question }  → { answer, sources }
+// 🔌 BACKEND: POST /chat  { question }  → { answer, sources }  ⚠️ NOT YET IMPLEMENTED in backend
 export async function sendMessage(
   question: string
 ): Promise<{ answer: string; sources: Source[] }> {
@@ -40,7 +40,7 @@ export async function sendMessage(
   );
 }
 
-// 🔌 BACKEND: GET /chat/history  → ChatHistoryItem[]
+// 🔌 BACKEND: GET /chat/history  → ChatHistoryItem[]  ⚠️ NOT YET IMPLEMENTED in backend
 export async function getChatHistory(): Promise<ChatHistoryItem[]> {
   void api; // will be: return (await api.get("/chat/history")).data
   return new Promise((resolve) =>
@@ -56,7 +56,7 @@ export async function getChatHistory(): Promise<ChatHistoryItem[]> {
   );
 }
 
-// 🔌 BACKEND: DELETE /chat/history/:id
+// 🔌 BACKEND: DELETE /chat/history/:id  ⚠️ NOT YET IMPLEMENTED in backend
 export async function deleteChatHistory(id: string): Promise<void> {
   void api; // will be: await api.delete(`/chat/history/${id}`)
   return new Promise((resolve) => setTimeout(resolve, 300));

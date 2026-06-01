@@ -7,15 +7,18 @@ export interface UploadedDocument {
   uploadedAt: string;
 }
 
-// 🔌 BACKEND: POST /documents/upload  (multipart/form-data, field: "files")  → UploadedDocument[]
+// 🔌 BACKEND: POST /data/upload  (multipart/form-data)  → { regulation_id, file_name, message }
+// ⚠️ SHAPE MISMATCH: backend expects one file at a time plus query params: department_id (UUID), title, version
+//    Frontend sends an array of files with no department_id/title/version — these params must be collected from UI
+// ⚠️ RESPONSE MISMATCH: backend returns { regulation_id, file_name, message }, not UploadedDocument[]
 export async function uploadDocuments(
   files: File[]
 ): Promise<UploadedDocument[]> {
   void api;
-  // Real call:
+  // Real call (single file, requires department_id + title + version from the UI):
   //   const form = new FormData();
-  //   files.forEach((f) => form.append("files", f));
-  //   return (await api.post("/documents/upload", form, {
+  //   form.append("file", file);
+  //   return (await api.post(`/data/upload?department_id=${deptId}&title=${title}&version=${version}`, form, {
   //     headers: { "Content-Type": "multipart/form-data" },
   //   })).data;
   return new Promise((resolve) =>
@@ -34,7 +37,7 @@ export async function uploadDocuments(
   );
 }
 
-// 🔌 BACKEND: GET /documents  → UploadedDocument[]
+// 🔌 BACKEND: GET /documents  → UploadedDocument[]  ⚠️ NOT YET IMPLEMENTED in backend
 export async function getDocuments(): Promise<UploadedDocument[]> {
   void api; // will be: return (await api.get("/documents")).data
   return new Promise((resolve) =>
@@ -59,7 +62,7 @@ export async function getDocuments(): Promise<UploadedDocument[]> {
   );
 }
 
-// 🔌 BACKEND: DELETE /documents/:id
+// 🔌 BACKEND: DELETE /documents/:id  ⚠️ NOT YET IMPLEMENTED in backend
 export async function deleteDocument(id: string): Promise<void> {
   void api; // will be: await api.delete(`/documents/${id}`)
   return new Promise((resolve) => setTimeout(resolve, 300));
