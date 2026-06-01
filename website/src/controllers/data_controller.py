@@ -1,9 +1,10 @@
 import re
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from fastapi import UploadFile, HTTPException, status
 from uuid import UUID
-from helpers.enums import ResponseStatus, FileTypeEnum
-from services import regulationservice
+from helpers.enums import ResponseStatus
+from services.data_service import regulation_service
 from controllers.base_controller import BaseController
 
 class DataController(BaseController):
@@ -31,6 +32,15 @@ class DataController(BaseController):
         
         file.filename = self.clean_file_name(file.filename)
 
-        return await regulationservice().upload_service(department_id, title, version, file, db)
+        regulation = await regulation_service.upload_service(department_id, title, version, file, db)
 
+        return JSONResponse(
+            content={
+                "message": ResponseStatus.FILE_VALIDATED_SUCCESS.value,
+                "file_id": file.filename,
+                "regulation_id": str(regulation.id)
+        
+            },
+            status_code=200
+        )
 data_controller = DataController()
