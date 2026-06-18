@@ -62,3 +62,10 @@ Content-Type: text/plain
 
 This is a test regulation document for the upload endpoint.
 ------RGUMindBoundary--
+
+###
+
+### 6. Extract Chunks
+# Replace documentId with a real document_id from your database.
+@documentId = c1bf01c6-9605-4257-a920-9cf8da913dcd
+POST {{baseUrl}}/data/{{documentId}}/chunk

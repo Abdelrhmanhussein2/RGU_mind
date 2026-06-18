@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, model_validator
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from helpers.enums import UserType
 class studentSignupRequest(BaseModel):

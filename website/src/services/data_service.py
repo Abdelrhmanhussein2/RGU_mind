@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import UploadFile
 from uuid import UUID
 from models import Document, Regulation
+import os
 
 
 class RegulationService:
@@ -16,10 +17,11 @@ class RegulationService:
         db.commit()
         db.refresh(new_regulation)
 
+        storage_path = f"uploads/{file.filename}"
         new_document = Document(
             regulation_id=new_regulation.id,
             filename=file.filename,
-            storage_path=f"uploads/{file.filename}",
+            storage_path=storage_path,
             file_size_bytes=file.size
         )
 
@@ -27,8 +29,12 @@ class RegulationService:
         db.commit()
         db.refresh(new_document)
 
-        return new_regulation
+        os.makedirs("uploads", exist_ok=True)
+        with open(storage_path, "wb") as buffer:
+            file.file.seek(0)
+            buffer.write(file.file.read())
+
+        return new_regulation, new_document
 
 
 regulation_service = RegulationService()
-

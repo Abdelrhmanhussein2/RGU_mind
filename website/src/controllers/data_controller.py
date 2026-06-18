@@ -32,14 +32,14 @@ class DataController(BaseController):
         
         file.filename = self.clean_file_name(file.filename)
 
-        regulation = await regulation_service.upload_service(department_id, title, version, file, db)
+        regulation, document = await regulation_service.upload_service(department_id, title, version, file, db)
 
         return JSONResponse(
             content={
                 "message": ResponseStatus.FILE_VALIDATED_SUCCESS.value,
                 "file_id": file.filename,
-                "regulation_id": str(regulation.id)
-        
+                "regulation_id": str(regulation.id),
+                "document_id": str(document.id)
             },
             status_code=200
         )
