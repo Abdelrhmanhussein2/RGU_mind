@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from helpers.enums import UserType
+from fastapi import UploadFile
 class studentSignupRequest(BaseModel):
     username: str
     email: EmailStr

@@ -28,15 +28,34 @@ Content-Type: application/json
 
 ### 3. Register a new university
 POST {{baseUrl}}/auth/university/register
-Content-Type: application/json
+Content-Type: multipart/form-data; boundary=boundary
 
-{
-    "name": "Tanta University",
-    "slug": "tanta-university",
-    "country": "Egypt",
-    "contact_email": "contact@tanta.edu.eg",
-    "password": "password123"
-}
+--boundary
+Content-Disposition: form-data; name="name"
+
+Tanta University
+--boundary
+Content-Disposition: form-data; name="slug"
+
+tanta-university
+--boundary
+Content-Disposition: form-data; name="country"
+
+Egypt
+--boundary
+Content-Disposition: form-data; name="contact_email"
+
+contact@tanta.edu.eg
+--boundary
+Content-Disposition: form-data; name="password"
+
+password123
+--boundary
+Content-Disposition: form-data; name="verification_file"; filename="test.txt"
+Content-Type: text/plain
+
+<This is a dummy text file to act as the uploaded verification document.>
+--boundary--
 
 ###
 
@@ -69,3 +88,28 @@ This is a test regulation document for the upload endpoint.
 # Replace documentId with a real document_id from your database.
 @documentId = c1bf01c6-9605-4257-a920-9cf8da913dcd
 POST {{baseUrl}}/data/{{documentId}}/chunk
+
+###
+
+### 7. Admin: Create a new admin
+POST {{baseUrl}}/admin/create-admin
+Content-Type: application/json
+x-admin-id: <PASTE_SUPER_ADMIN_ID_HERE>
+
+{
+    "name": "Regular Admin",
+    "email": "admin@example.com",
+    "password": "adminpassword"
+}
+
+###
+
+### 8. Admin: Approve University
+POST {{baseUrl}}/admin/approve-university/<PASTE_UNIVERSITY_ID_HERE>
+x-admin-id: <PASTE_ADMIN_ID_HERE>
+
+###
+
+### 9. Admin: Reject University
+POST {{baseUrl}}/admin/reject-university/<PASTE_UNIVERSITY_ID_HERE>
+x-admin-id: <PASTE_ADMIN_ID_HERE>

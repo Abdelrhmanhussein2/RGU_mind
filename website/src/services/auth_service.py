@@ -4,6 +4,9 @@ from models.user_model import Student
 from helpers.security import verify_password , hash_password
 from models.university_model import University
 from models.faculty_model import Faculty
+from fastapi import HTTPException
+import os
+import shutil
 
 class AuthService:
     def register_student(self, request, db: Session):
@@ -55,7 +58,8 @@ class AuthService:
         return student
 
 
-    def register_university(self, request, db: Session):
+    def register_university(self, request, verification_file, db: Session):
+
         existing_university = db.query(University).filter(
             (University.contact_email == request.contact_email) |
             (University.slug == request.slug)
@@ -64,12 +68,21 @@ class AuthService:
         if existing_university:
             raise ValueError("University email or slug already exists")
 
+        # Save verification file
+        upload_dir = "uploads"
+        os.makedirs(upload_dir, exist_ok=True)
+        file_path = os.path.join(upload_dir, verification_file.filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(verification_file.file, buffer)
+
         university = University(
             name=request.name,
             slug=request.slug,
             country=request.country,
             contact_email=request.contact_email,
-            password=hash_password(request.password)
+            password=hash_password(request.password),
+            verification_file_url=file_path,
+            status="pending"
         )
 
         db.add(university)
@@ -88,6 +101,9 @@ class AuthService:
 
         if not university or not verify_password(request.password, university.password):
             raise PermissionError("Invalid email/name/slug or password")
+
+        if university.status.lower() != "approved":
+            raise PermissionError("University account is pending approval by an admin.")
 
         return university
 

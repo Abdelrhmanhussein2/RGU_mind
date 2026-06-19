@@ -8,11 +8,13 @@ from helpers.config import Base
 class University(Base):
     __tablename__ = "university"
 
-    id            = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    name          = Column(String(255), nullable=False)
-    slug          = Column(String(100), unique=True, nullable=False)
-    country       = Column(String(255), nullable=False)
-    contact_email = Column(String(255), unique=True, nullable=False)
-    password      = Column(String, nullable=False)
-    is_active     = Column(Boolean, default=True)
-    created_at    = Column(DateTime, default=datetime.utcnow)
+    id                      = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    name                    = Column(String(255), nullable=False)
+    slug                    = Column(String(100), unique=True, nullable=False)
+    verification_file_url   = Column(String(255), nullable=False)
+    status                  = Column(String(50), default="pending")
+    country                 = Column(String(255), nullable=False)
+    contact_email           = Column(String(255), unique=True, nullable=False)
+    password                = Column(String, nullable=False)
+    is_active               = Column(Boolean, default=True)
+    created_at              = Column(DateTime, default=datetime.utcnow)

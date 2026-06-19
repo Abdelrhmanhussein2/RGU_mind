@@ -16,9 +16,28 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     return auth_controller.login_controller(request, db)
 
 
+from fastapi import Form, UploadFile, File
+import shutil
+import os
+
 @auth_router.post("/university/register")
-async def register_university(request: universitySignupRequest, db: Session = Depends(get_db)):
-    return auth_controller.register_university_controller(request, db)
+async def register_university(
+    name: str = Form(...),
+    slug: str = Form(...),
+    country: str = Form(...),
+    contact_email: str = Form(...),
+    password: str = Form(...),
+    verification_file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    request = universitySignupRequest(
+        name=name,
+        slug=slug,
+        country=country,
+        contact_email=contact_email,
+        password=password
+    )
+    return auth_controller.register_university_controller(request, verification_file, db)
 
 
 @auth_router.post("/university/login")

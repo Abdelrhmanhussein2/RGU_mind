@@ -36,9 +36,9 @@ class AuthController:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 
 
-    def register_university_controller(self, request, db: Session):
+    def register_university_controller(self, request, verification_file, db: Session):
         try:
-            university = auth_service.register_university(request, db)
+            university = auth_service.register_university(request, verification_file, db)
             return {
                 "message": "university registered successfully",
                 "user": {
