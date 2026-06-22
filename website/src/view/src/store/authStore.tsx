@@ -4,9 +4,15 @@ import {
   useReducer,
   ReactNode,
 } from "react";
-import { AuthUser, getMe } from "../services/authService";
+import { AuthUser as BaseAuthUser, getMe } from "../services/authService";
 
-export type Role = "student" | "university";
+export type Role = "student" | "university" | "admin";
+
+// Widens the backend-driven AuthUser (role: "student" | "university") to also allow "admin",
+// since admin auth is fully mocked on the frontend and never touches authService.ts.
+export interface AuthUser extends Omit<BaseAuthUser, "role"> {
+  role: Role;
+}
 
 interface AuthState {
   user: AuthUser | null;

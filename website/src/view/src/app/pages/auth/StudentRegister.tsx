@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Mail, Lock, User, Building2, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Building2, Eye, EyeOff, ChevronDown, IdCard, BookOpen, Layers, FileText } from "lucide-react";
 import { AuthLayout } from "../../components/auth/AuthLayout";
 import { PasswordStrengthIndicator } from "../../components/auth/PasswordStrengthIndicator";
 import { registerStudent } from "../../../services/authService";
 import { useAuth } from "../../../store/authStore";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "../../components/ui/collapsible";
+import { createStudentProfile } from "../../lib/studentProfile";
 
 export function StudentRegister() {
   const navigate = useNavigate();
@@ -13,13 +15,34 @@ export function StudentRegister() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showAcademicPlan, setShowAcademicPlan] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     university: "",
     email: "",
     password: "",
     confirmPassword: "",
+    faculty: "",
+    department: "",
+    studentId: "",
+    enrollmentYear: new Date().getFullYear(),
+    expectedGraduationYear: new Date().getFullYear() + 4,
   });
+  const [academicPlan, setAcademicPlan] = useState({
+    totalRequiredCreditHours: 0,
+    mandatoryCreditHours: 0,
+    electiveCreditHours: 0,
+    majorCreditHours: 0,
+  });
+  const [curriculumPdf, setCurriculumPdf] = useState<{ name: string; base64: string } | undefined>(undefined);
+
+  const handleCurriculumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCurriculumPdf({ name: file.name, base64: reader.result as string });
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +61,24 @@ export function StudentRegister() {
         formData.password
       );
       login(user, token);
+
+      // 🔌 BACKEND: POST /student/profile
+      createStudentProfile({
+        fullName: formData.fullName,
+        studentId: formData.studentId,
+        university: formData.university,
+        faculty: formData.faculty,
+        department: formData.department,
+        enrollmentYear: formData.enrollmentYear,
+        expectedGraduationYear: formData.expectedGraduationYear,
+        totalRequiredCreditHours: academicPlan.totalRequiredCreditHours,
+        mandatoryCreditHours: academicPlan.mandatoryCreditHours,
+        electiveCreditHours: academicPlan.electiveCreditHours,
+        majorCreditHours: academicPlan.majorCreditHours,
+        curriculumPdfName: curriculumPdf?.name,
+        curriculumPdfBase64: curriculumPdf?.base64,
+      });
+
       navigate("/student/chat");
     } catch {
       setError("Registration failed. Please try again.");
@@ -98,6 +139,181 @@ export function StudentRegister() {
               />
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Faculty</label>
+              <div className="relative">
+                <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.faculty}
+                  onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
+                  placeholder="Computer Science"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+              <div className="relative">
+                <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  placeholder="Software Engineering"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
+            <div className="relative">
+              <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={formData.studentId}
+                onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
+                placeholder="20210001"
+                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Enrollment Year</label>
+              <input
+                type="number"
+                value={formData.enrollmentYear}
+                onChange={(e) =>
+                  setFormData({ ...formData, enrollmentYear: Number(e.target.value) || 0 })
+                }
+                placeholder="2021"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Expected Graduation Year
+              </label>
+              <input
+                type="number"
+                value={formData.expectedGraduationYear}
+                onChange={(e) =>
+                  setFormData({ ...formData, expectedGraduationYear: Number(e.target.value) || 0 })
+                }
+                placeholder="2025"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+          </div>
+
+          <Collapsible open={showAcademicPlan} onOpenChange={setShowAcademicPlan}>
+            <CollapsibleTrigger
+              type="button"
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            >
+              <span>Academic Plan Details (Optional)</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${showAcademicPlan ? "rotate-180" : ""}`}
+              />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Total Required Credit Hours
+                  </label>
+                  <input
+                    type="number"
+                    value={academicPlan.totalRequiredCreditHours}
+                    onChange={(e) =>
+                      setAcademicPlan({
+                        ...academicPlan,
+                        totalRequiredCreditHours: Number(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mandatory Credit Hours
+                  </label>
+                  <input
+                    type="number"
+                    value={academicPlan.mandatoryCreditHours}
+                    onChange={(e) =>
+                      setAcademicPlan({
+                        ...academicPlan,
+                        mandatoryCreditHours: Number(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Elective Credit Hours
+                  </label>
+                  <input
+                    type="number"
+                    value={academicPlan.electiveCreditHours}
+                    onChange={(e) =>
+                      setAcademicPlan({
+                        ...academicPlan,
+                        electiveCreditHours: Number(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Major Credit Hours
+                  </label>
+                  <input
+                    type="number"
+                    value={academicPlan.majorCreditHours}
+                    onChange={(e) =>
+                      setAcademicPlan({
+                        ...academicPlan,
+                        majorCreditHours: Number(e.target.value) || 0,
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload your faculty curriculum (optional)
+                </label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleCurriculumChange}
+                    className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                {curriculumPdf && (
+                  <p className="text-xs text-indigo-600 mt-1.5">Selected: {curriculumPdf.name}</p>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

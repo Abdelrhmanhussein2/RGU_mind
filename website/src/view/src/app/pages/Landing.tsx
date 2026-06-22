@@ -121,6 +121,15 @@ export function Landing() {
             </p>
           </div>
         </div>
+
+        <div className="text-center mt-16">
+          <button
+            onClick={() => navigate("/admin/signin")}
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            Admin Portal
+          </button>
+        </div>
       </main>
     </div>
   );

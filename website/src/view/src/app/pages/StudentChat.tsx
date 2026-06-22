@@ -12,10 +12,19 @@ import {
   ChevronDown,
   Home,
   Sparkles,
+  GraduationCap,
+  Bell,
 } from "lucide-react";
 import { sendMessage, getChatHistory } from "../../services/chatService";
 import { logout } from "../../services/authService";
 import { useAuth } from "../../store/authStore";
+import { Popover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
+import {
+  NotificationItem,
+  getNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+} from "../lib/notifications";
 
 interface Message {
   id: string;
@@ -38,6 +47,9 @@ export function StudentChat() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSources, setShowSources] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const exampleQuestions = [
     "What happens if I fail a course?",
@@ -49,7 +61,16 @@ export function StudentChat() {
   useEffect(() => {
     // 🔌 BACKEND: replace mock with real getChatHistory call
     getChatHistory().then(setChats);
+    setNotifications(getNotifications());
   }, []);
+
+  const handleNotificationClick = (id: string) => {
+    setNotifications(markNotificationRead(id));
+  };
+
+  const handleMarkAllRead = () => {
+    setNotifications(markAllNotificationsRead());
+  };
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -153,6 +174,13 @@ export function StudentChat() {
             <span className="text-sm font-medium">Profile</span>
           </button>
           <button
+            onClick={() => navigate("/student/academic-profile")}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
+          >
+            <GraduationCap className="w-5 h-5" />
+            <span className="text-sm font-medium">Academic Profile</span>
+          </button>
+          <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
           >
@@ -164,6 +192,61 @@ export function StudentChat() {
 
       {/* Main Chat Area */}
       <main className="flex-1 flex flex-col">
+        {/* Navbar */}
+        <div className="flex items-center justify-end gap-2 border-b border-gray-200 bg-white px-4 py-2.5">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="relative p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-white bg-red-500 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                <span className="font-semibold text-gray-900">Notifications</span>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                  >
+                    Mark all read
+                  </button>
+                )}
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <p className="px-4 py-6 text-sm text-gray-500 text-center">No notifications</p>
+                ) : (
+                  notifications.map((n) => (
+                    <button
+                      key={n.id}
+                      onClick={() => handleNotificationClick(n.id)}
+                      className={`w-full text-left px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors ${
+                        n.read ? "bg-white" : "bg-indigo-50/60"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        {!n.read && <span className="w-2 h-2 mt-1.5 rounded-full bg-indigo-600 flex-shrink-0" />}
+                        <div className={n.read ? "ml-4" : ""}>
+                          <p className="text-sm font-medium text-gray-900">{n.title}</p>
+                          <p className="text-xs text-gray-600 mt-0.5">{n.message}</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {new Date(n.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
         {/* Messages Area */}
         <div className="flex-1 overflow-auto">
           {messages.length === 0 ? (

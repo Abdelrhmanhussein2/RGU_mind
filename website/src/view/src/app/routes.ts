@@ -3,6 +3,8 @@ import { createBrowserRouter } from "react-router";
 import { Landing } from "./pages/Landing";
 import { UniversityDashboard } from "./pages/UniversityDashboard";
 import { StudentChat } from "./pages/StudentChat";
+import { StudentAcademicProfile } from "./pages/StudentAcademicProfile";
+import { AdminDashboard } from "./pages/AdminDashboard";
 
 // Student Authentication Pages
 import { StudentSignIn } from "./pages/auth/StudentSignIn";
@@ -18,6 +20,10 @@ import { UniversityForgotPassword } from "./pages/auth/UniversityForgotPassword"
 import { UniversityOtpVerification } from "./pages/auth/UniversityOtpVerification";
 import { UniversityResetPassword } from "./pages/auth/UniversityResetPassword";
 
+// Admin Authentication Pages
+import { AdminSignIn } from "./pages/auth/AdminSignIn";
+import { AdminOtpVerification } from "./pages/auth/AdminOtpVerification";
+
 // Protected Route wrapper
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
@@ -27,10 +33,22 @@ const studentChat = createElement(
   createElement(StudentChat)
 );
 
+const studentAcademicProfile = createElement(
+  ProtectedRoute,
+  { requiredRole: "student" },
+  createElement(StudentAcademicProfile)
+);
+
 const universityDashboard = createElement(
   ProtectedRoute,
   { requiredRole: "university" },
   createElement(UniversityDashboard)
+);
+
+const adminDashboard = createElement(
+  ProtectedRoute,
+  { requiredRole: "admin" },
+  createElement(AdminDashboard)
 );
 
 export const router = createBrowserRouter([
@@ -66,6 +84,10 @@ export const router = createBrowserRouter([
     path: "/student/chat",
     element: studentChat,
   },
+  {
+    path: "/student/academic-profile",
+    element: studentAcademicProfile,
+  },
 
   // University Auth Routes (public)
   {
@@ -93,5 +115,21 @@ export const router = createBrowserRouter([
   {
     path: "/university",
     element: universityDashboard,
+  },
+
+  // Admin Auth Routes (public)
+  {
+    path: "/admin/signin",
+    Component: AdminSignIn,
+  },
+  {
+    path: "/admin/verify-otp",
+    Component: AdminOtpVerification,
+  },
+
+  // Admin Protected Routes
+  {
+    path: "/admin",
+    element: adminDashboard,
   },
 ]);
