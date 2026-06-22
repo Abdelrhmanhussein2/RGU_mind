@@ -6,13 +6,14 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from uuid import UUID
 from helpers.enums import ResponseStatus
-from services.chunk_service import chunkservice
+from services.chunk_service import chunk_service
+from services.embedding_service import embedding_service
 from models.document_model import Document
 import os
 
 
 class ChunkController:
-    def extract_chunk(self, document_id: UUID, db: Session):
+    async def extract_chunk(self, document_id: UUID, db: Session):
         try:
             document = db.query(Document).filter(Document.id == document_id).first()
             if not document:
@@ -30,12 +31,12 @@ class ChunkController:
             with open(document.storage_path, "rb") as f:
                 file_bytes = f.read()
 
-            # Initialize chunkservice with the db session
-            service = chunkservice(db=db)
             
             # Extract chunks from the provided file_bytes
-            data_chunk = service.create_chunk(file_bytes, document_id, document.filename)
+            data_chunk = chunk_service.create_chunk(db, file_bytes, document_id, document.filename)
             
+            # Embed and store chunks
+            await embedding_service.embed_and_store(document_id, db)
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
                 content={

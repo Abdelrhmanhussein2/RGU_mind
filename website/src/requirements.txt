@@ -12,3 +12,5 @@ langchain
 langchain-text-splitters
 unstructured[pdf]
 unstructured[local-inference]
+cohere
+qdrant-client

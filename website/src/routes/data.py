@@ -17,4 +17,4 @@ async def upload_file(department_id: UUID, title: str, version: str, file: Uploa
 
 @data_router.post("/{document_id}/chunk")
 async def extract_chunks(document_id: UUID, db: Session = Depends(get_db)):
-    return chunk_controller.extract_chunk(document_id, db)
+    return await chunk_controller.extract_chunk(document_id, db)

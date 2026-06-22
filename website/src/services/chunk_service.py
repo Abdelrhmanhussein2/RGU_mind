@@ -12,9 +12,9 @@ from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 from collections import Counter
 
-class chunkservice:
-    def __init__(self,db:Session):
-        self.db = db
+class ChunkService:
+    def __init__(self):
+
         self.splitter=RecursiveCharacterTextSplitter(
             chunk_size = 500,
             chunk_overlap = 50,
@@ -44,7 +44,7 @@ class chunkservice:
 
 
 
-    def create_chunk(self, file: bytes, document_id: UUID, filename: str):
+    def create_chunk(self, db: Session, file: bytes, document_id: UUID, filename: str):
         result_chunks = []
         chunk_index = 0
         pages_text = []
@@ -96,7 +96,7 @@ class chunkservice:
             sub_chunks = self.splitter.split_text(clean)
             for chunk_text in sub_chunks:
                 chunk_uuid = uuid.uuid4()
-                self.db.add(Chunk(
+                db.add(Chunk(
                     id=chunk_uuid,
                     document_id=document_id,
                     chunk_index=chunk_index,
@@ -111,5 +111,7 @@ class chunkservice:
                 ))
                 chunk_index += 1
 
-        self.db.commit()
+        db.commit()
         return result_chunks
+
+chunk_service = ChunkService()
