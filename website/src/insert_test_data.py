@@ -21,7 +21,8 @@ def insert_test_data():
             slug="tanta-uni",
             country="Egypt",
             contact_email="contact@tanta.edu.eg",
-            password="hashed_dummy_password"
+            password="hashed_dummy_password",
+            verification_file_url="uploads/tanta_verification.txt"
         )
         db.add(existing_uni)
         db.commit()

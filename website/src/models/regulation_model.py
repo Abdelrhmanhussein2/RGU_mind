@@ -15,4 +15,6 @@ class Regulation(Base):
     title         = Column(String(500), nullable=False)
     version       = Column(String(50), nullable=True)
     status        = Column(Enum(RegulationStatus), nullable=False, default=RegulationStatus.draft)
+    rejection_reason = Column(String(1000), nullable=True)
+    reviewed_at    = Column(DateTime, nullable=True)
     created_at    = Column(DateTime, default=datetime.utcnow)

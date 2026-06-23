@@ -1,17 +1,22 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from services.auth_service import auth_service
+from helpers.security import create_access_token
+
 
 class AuthController:
     def register_student_controller(self, request, db: Session):
         try:
             student = auth_service.register_student(request, db)
+            token = create_access_token(data={"sub": str(student.id), "role": "student"})
             return {
                 "message": "student registered successfully",
+                "token": token,
                 "user": {
                     "id": str(student.id),
                     "name": student.name,
                     "email": student.email,
+                    "role": "student",
                     "university_id": str(student.university_id) if student.university_id else None,
                     "faculty_id": str(student.faculty_id) if student.faculty_id else None
                 }
@@ -24,12 +29,15 @@ class AuthController:
     def login_controller(self, request, db: Session):
         try:
             student = auth_service.login_student(request, db)
+            token = create_access_token(data={"sub": str(student.id), "role": "student"})
             return {
                 "message": "login successful",
+                "token": token,
                 "user": {
                     "id": str(student.id),
                     "name": student.name,
-                    "email": student.email
+                    "email": student.email,
+                    "role": "student"
                 }
             }
         except PermissionError as e:
@@ -39,14 +47,17 @@ class AuthController:
     def register_university_controller(self, request, verification_file, db: Session):
         try:
             university = auth_service.register_university(request, verification_file, db)
+            token = create_access_token(data={"sub": str(university.id), "role": "university"})
             return {
                 "message": "university registered successfully",
+                "token": token,
                 "user": {
                     "id": str(university.id),
                     "name": university.name,
                     "slug": university.slug,
                     "country": university.country,
-                    "contact_email": university.contact_email
+                    "email": university.contact_email,
+                    "role": "university"
                 }
             }
         except ValueError as e:
@@ -56,17 +67,21 @@ class AuthController:
     def login_university_controller(self, request, db: Session):
         try:
             university = auth_service.login_university(request, db)
+            token = create_access_token(data={"sub": str(university.id), "role": "university"})
             return {
                 "message": "university login successful",
+                "token": token,
                 "user": {
                     "id": str(university.id),
                     "name": university.name,
                     "slug": university.slug,
                     "country": university.country,
-                    "contact_email": university.contact_email
+                    "email": university.contact_email,
+                    "role": "university"
                 }
             }
         except PermissionError as e:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+
 
 auth_controller = AuthController()

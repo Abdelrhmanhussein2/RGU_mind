@@ -144,7 +144,7 @@ describe('StudentChat — sending messages', () => {
 
     // After submit the input is cleared → button disabled because !input.trim()
     // AND because isLoading is true — both conditions hold
-    const submitBtn = screen.getByRole('button', { name: '' }); // Send icon button
+    const submitBtn = screen.getByRole('button', { name: /send message/i }); // Send icon button
     await waitFor(() => {
       expect(submitBtn).toBeDisabled();
     });

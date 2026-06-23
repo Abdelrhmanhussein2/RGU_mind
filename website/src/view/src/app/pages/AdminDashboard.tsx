@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
   ShieldCheck,
@@ -27,6 +27,7 @@ import {
   approveRegulation,
   rejectRegulation,
 } from "../lib/adminRegulations";
+import api from "../../services/api";
 
 type Tab = "pending" | "approved" | "rejected" | "settings";
 
@@ -74,32 +75,81 @@ function RegulationCard({
 
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const { state, logout } = useAuth();
+  const { state, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("pending");
-  const [regulations, setRegulations] = useState<RegulationSubmission[]>(() => getRegulations());
+  const [regulations, setRegulations] = useState<RegulationSubmission[]>([]);
   const [rejectTarget, setRejectTarget] = useState<RegulationSubmission | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [profile, setProfile] = useState({
     name: state.user?.name || "Platform Admin",
     email: state.user?.email || "",
   });
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+
+  const loadRegulations = async () => {
+    const data = await getRegulations();
+    setRegulations(data);
+  };
+
+  useEffect(() => {
+    loadRegulations();
+  }, []);
 
   const pending = regulations.filter((r) => r.status === "pending");
   const approved = regulations.filter((r) => r.status === "approved");
   const rejected = regulations.filter((r) => r.status === "rejected");
 
-  const handleApprove = (id: string) => setRegulations(approveRegulation(id));
+  const handleApprove = async (id: string) => {
+    try {
+      await approveRegulation(id);
+      await loadRegulations();
+    } catch (err) {
+      console.error("Failed to approve regulation:", err);
+    }
+  };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = async () => {
     if (!rejectTarget || !rejectionReason.trim()) return;
-    setRegulations(rejectRegulation(rejectTarget.id, rejectionReason.trim()));
-    setRejectTarget(null);
-    setRejectionReason("");
+    try {
+      await rejectRegulation(rejectTarget.id, rejectionReason.trim());
+      setRejectTarget(null);
+      setRejectionReason("");
+      await loadRegulations();
+    } catch (err) {
+      console.error("Failed to reject regulation:", err);
+    }
   };
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleSaveProfile = async () => {
+    setSaveStatus("saving");
+    try {
+      const response = await api.put("/admin/profile", {
+        name: profile.name,
+        email: profile.email,
+      });
+      if (state.token) {
+        login(
+          {
+            id: response.data.id,
+            name: response.data.name,
+            email: response.data.email,
+            role: "admin",
+          },
+          state.token
+        );
+      }
+      setSaveStatus("success");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    }
   };
 
   const navItems: { id: Tab; label: string; icon: typeof Clock; count?: number }[] = [
@@ -232,8 +282,21 @@ export function AdminDashboard() {
                     className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
-                {/* 🔌 BACKEND: PUT /admin/profile */}
-                <Button>Save Changes</Button>
+                <div className="flex items-center gap-4">
+                  <Button onClick={handleSaveProfile} disabled={saveStatus === "saving"}>
+                    {saveStatus === "saving" ? "Saving..." : "Save Changes"}
+                  </Button>
+                  {saveStatus === "success" && (
+                    <span className="text-sm font-medium text-emerald-600">
+                      Changes saved successfully!
+                    </span>
+                  )}
+                  {saveStatus === "error" && (
+                    <span className="text-sm font-medium text-rose-600">
+                      Failed to save changes.
+                    </span>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>

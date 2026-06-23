@@ -5,6 +5,8 @@ import { AuthLayout } from "../../components/auth/AuthLayout";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
 import { useAuth } from "../../../store/authStore";
 
+import api from "../../../services/api";
+
 export function AdminOtpVerification() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,12 +28,13 @@ export function AdminOtpVerification() {
     setError("");
     setIsLoading(true);
     try {
-      // 🔌 BACKEND: POST /admin/auth/verify-otp  { email, otp }  → { token, user }
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      login(
-        { id: "admin-1", name: "Platform Admin", email, role: "admin" },
-        "mock-admin-token"
-      );
+      // 🔌 BACKEND: POST /admin/auth/verify-otp  { email, otp }
+      const response = await api.post("/admin/auth/verify-otp", {
+        email,
+        otp,
+      });
+      const { token, user } = response.data;
+      login(user, token);
       navigate("/admin");
     } catch {
       setError("Invalid or expired code. Please try again.");

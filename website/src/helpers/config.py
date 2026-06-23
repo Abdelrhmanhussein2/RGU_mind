@@ -1,9 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from dotenv import load_dotenv
+from pathlib import Path
 import os
 
-load_dotenv()
+# Load .env from src/ directory (two levels up from this file: helpers/config.py -> helpers/ -> src/)
+_env_path = Path(__file__).resolve().parents[1] / ".env"
+load_dotenv(dotenv_path=_env_path, override=True)
 
 POSTGRES_USER     = os.getenv("POSTGRES_USER", "admin")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "admin123")
@@ -17,6 +20,8 @@ QDRANT_URL = os.getenv("QDRANT_URL")
 class Settings:
     FILE_ALLOWED_TYPES = os.getenv("FILE_ALLOWED_TYPES", "application/pdf,text/plain").split(",")
     FILE_MAX_SIZE_MB   = int(os.getenv("FILE_MAX_SIZE_MB", "50"))
+    JWT_SECRET_KEY     = os.getenv("JWT_SECRET_KEY", "super_secret_key_12345_rgumind")
+    JWT_ALGORITHM      = os.getenv("JWT_ALGORITHM", "HS256")
 
 settings = Settings()
 

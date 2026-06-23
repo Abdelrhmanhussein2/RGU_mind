@@ -1,13 +1,12 @@
-from huggingface_hub.inference._generated.types import text_classification
-from sqlalchemy.orm import Session
+﻿from sqlalchemy.orm import Session
 from uuid import UUID
-import uuid
-import re
 from cohere import Client
 from helpers.config import COHERE_API_KEY, QDRANT_API_KEY, QDRANT_URL
-import qdrant_client 
+import qdrant_client
 from qdrant_client.models import VectorParams, PointStruct, Distance
-from chunk_model import Chunk
+
+from models.chunk_model import Chunk
+
 
 class EmbeddingService:
     def __init__(self):
@@ -31,17 +30,14 @@ class EmbeddingService:
                 )
             )
 
-    async def embed_and_store(self,document_id:UUID, db:Session):
-        chunks=db.query(Chunk).filter(Chunk.document_id==document_id).all()
+    async def embed_and_store(self, document_id: UUID, db: Session):
+        chunks = db.query(Chunk).filter(Chunk.document_id == document_id).all()
 
         if not chunks:
             raise ValueError("No chunks found for this document")
 
-        texts=[
-            c.content
-            for c in chunks
-        ]
-        
+        texts = [c.content for c in chunks]
+
         response = self.co.embed(
             texts=texts,
             model="embed-multilingual-v3.0",
@@ -51,24 +47,25 @@ class EmbeddingService:
 
         self._ensure_collection_exists()
 
-        points=[
+        points = [
             PointStruct(
                 id=str(c.id),
                 vector=embeddings,
                 payload={
-                "document_id":str(document_id),
-                "chunk_id":str(c.id),
-                "content":c.content,
-                "page_ref":c.page_ref
+                    "document_id": str(document_id),
+                    "chunk_id": str(c.id),
+                    "content": c.content,
+                    "page_ref": c.page_ref
                 }
             )
             for c in chunks
         ]
-
 
         self.qdrant.upsert(
             collection_name=self.collection_name,
             points=points
         )
         return {"message": f"Embedded {len(points)} chunks successfully"}
-embedding_service=EmbeddingService()
+
+
+embedding_service = EmbeddingService()

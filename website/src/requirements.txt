@@ -12,5 +12,7 @@ langchain
 langchain-text-splitters
 unstructured[pdf]
 unstructured[local-inference]
+pyjwt
+python-multipart
 cohere
 qdrant-client

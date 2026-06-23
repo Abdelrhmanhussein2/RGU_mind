@@ -12,6 +12,53 @@ import {
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
+vi.mock('@/services/api', () => ({
+  default: {
+    post: vi.fn((url, data) => {
+      if (url === '/auth/login') {
+        return Promise.resolve({
+          data: {
+            token: 'mock-student-token',
+            user: {
+              id: '1',
+              name: 'Alice',
+              email: data.email_or_username,
+              role: 'student'
+            }
+          }
+        });
+      }
+      if (url === '/auth/university/login') {
+        return Promise.resolve({
+          data: {
+            token: 'mock-university-token',
+            user: {
+              id: '2',
+              name: 'Test Uni',
+              email: data.email_or_username,
+              role: 'university'
+            }
+          }
+        });
+      }
+      if (url === '/auth/register') {
+        return Promise.resolve({
+          data: {
+            token: 'mock-student-token',
+            user: {
+              id: '1',
+              name: data.username,
+              email: data.email,
+              role: 'student'
+            }
+          }
+        });
+      }
+      return Promise.reject(new Error('Unknown url'));
+    }),
+  }
+}));
+
 describe('loginStudent', () => {
   it('returns a token', async () => {
     const promise = loginStudent('student@uni.edu', 'pass');

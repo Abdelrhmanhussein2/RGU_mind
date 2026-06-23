@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import { Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { AuthLayout } from "../../components/auth/AuthLayout";
 
+import api from "../../../services/api";
+
 export function AdminSignIn() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -15,8 +17,11 @@ export function AdminSignIn() {
     setError("");
     setIsLoading(true);
     try {
-      // 🔌 BACKEND: POST /admin/auth/login  { email, password }  → triggers OTP send to admin email
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // 🔌 BACKEND: POST /admin/auth/login  { email, password }
+      await api.post("/admin/auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
       navigate("/admin/verify-otp", { state: { email: formData.email } });
     } catch {
       setError("Invalid email or password. Please try again.");

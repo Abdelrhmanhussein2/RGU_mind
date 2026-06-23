@@ -63,7 +63,7 @@ export function StudentRegister() {
       login(user, token);
 
       // 🔌 BACKEND: POST /student/profile
-      createStudentProfile({
+      await createStudentProfile({
         fullName: formData.fullName,
         studentId: formData.studentId,
         university: formData.university,

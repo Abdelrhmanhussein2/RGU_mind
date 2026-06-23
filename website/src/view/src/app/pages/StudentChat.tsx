@@ -58,18 +58,37 @@ export function StudentChat() {
     "What are the attendance requirements?",
   ];
 
+  const fetchNotifications = async () => {
+    try {
+      const data = await getNotifications();
+      setNotifications(data);
+    } catch (err) {
+      console.error("Failed to fetch notifications:", err);
+    }
+  };
+
   useEffect(() => {
     // 🔌 BACKEND: replace mock with real getChatHistory call
     getChatHistory().then(setChats);
-    setNotifications(getNotifications());
+    fetchNotifications();
   }, []);
 
-  const handleNotificationClick = (id: string) => {
-    setNotifications(markNotificationRead(id));
+  const handleNotificationClick = async (id: string) => {
+    try {
+      await markNotificationRead(id);
+      fetchNotifications();
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+    }
   };
 
-  const handleMarkAllRead = () => {
-    setNotifications(markAllNotificationsRead());
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllNotificationsRead();
+      fetchNotifications();
+    } catch (err) {
+      console.error("Failed to mark all notifications as read:", err);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -169,7 +188,9 @@ export function StudentChat() {
             <Home className="w-5 h-5" />
             <span className="text-sm font-medium">Home</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
+          <button 
+            onClick={() => navigate("/student/academic-profile?tab=info")}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
             <User className="w-5 h-5" />
             <span className="text-sm font-medium">Profile</span>
           </button>
@@ -417,6 +438,7 @@ export function StudentChat() {
               />
               <button
                 type="submit"
+                aria-label="Send message"
                 disabled={!input.trim() || isLoading}
                 className="absolute right-2 bottom-2 p-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >

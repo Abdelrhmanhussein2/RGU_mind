@@ -77,6 +77,7 @@ import {
   StudentProfile,
   getStudentProfile,
   updateStudentProfile,
+  EMPTY_STUDENT_PROFILE,
 } from "../lib/studentProfile";
 import {
   calculateStanding,
@@ -577,14 +578,20 @@ function AddTermDialog({
 
 function GradesHistoryTab({
   images,
-  setImages,
+  onAddImage,
+  onDeleteImage,
   terms,
-  setTerms,
+  onAddTerm,
+  onDeleteTerm,
+  onDeleteCourse,
 }: {
   images: ResultImage[];
-  setImages: (images: ResultImage[]) => void;
+  onAddImage: (img: { termName: string; imageBase64: string }) => Promise<void>;
+  onDeleteImage: (id: string) => Promise<void>;
   terms: TermGrades[];
-  setTerms: (terms: TermGrades[]) => void;
+  onAddTerm: (term: { termName: string; courses: Course[] }) => Promise<void>;
+  onDeleteTerm: (id: string) => Promise<void>;
+  onDeleteCourse: (termId: string, courseId: string) => Promise<void>;
 }) {
   const [viewImage, setViewImage] = useState<string | null>(null);
   const [showAddImage, setShowAddImage] = useState(false);
@@ -610,9 +617,9 @@ function GradesHistoryTab({
             {images.map((img) => (
               <Card key={img.id} className="overflow-hidden">
                 <button
-                  type="button"
-                  onClick={() => setViewImage(img.imageBase64)}
-                  className="block w-full h-36 bg-gray-100"
+                   type="button"
+                   onClick={() => setViewImage(img.imageBase64)}
+                   className="block w-full h-36 bg-gray-100"
                 >
                   <img src={img.imageBase64} alt={img.termName} className="w-full h-full object-cover" />
                 </button>
@@ -623,7 +630,7 @@ function GradesHistoryTab({
                   </div>
                   <button
                     type="button"
-                    onClick={() => setImages(deleteResultImage(img.id))}
+                    onClick={() => onDeleteImage(img.id)}
                     className="text-gray-400 hover:text-red-600"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -672,7 +679,7 @@ function GradesHistoryTab({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setTerms(deleteTermGrades(term.id));
+                        onDeleteTerm(term.id);
                       }}
                       className="ml-2 text-gray-400 hover:text-red-600 flex-shrink-0"
                     >
@@ -685,7 +692,7 @@ function GradesHistoryTab({
                     ) : (
                       <Table>
                         <TableHeader>
-                          <TableRow>
+                           <TableRow>
                             <TableHead>Course Name</TableHead>
                             <TableHead>Credit Hours</TableHead>
                             <TableHead>Grade</TableHead>
@@ -703,7 +710,7 @@ function GradesHistoryTab({
                               <TableCell>
                                 <button
                                   type="button"
-                                  onClick={() => setTerms(deleteCourseFromTerm(term.id, c.id))}
+                                  onClick={() => onDeleteCourse(term.id, c.id)}
                                   className="text-gray-400 hover:text-red-600"
                                 >
                                   <X className="w-4 h-4" />
@@ -725,12 +732,12 @@ function GradesHistoryTab({
       <AddResultImageDialog
         open={showAddImage}
         onOpenChange={setShowAddImage}
-        onSave={(img) => setImages(addResultImage(img))}
+        onSave={onAddImage}
       />
       <AddTermDialog
         open={showAddTerm}
         onOpenChange={setShowAddTerm}
-        onSave={(term) => setTerms(addTermGrades(term))}
+        onSave={onAddTerm}
       />
 
       <Dialog open={!!viewImage} onOpenChange={() => setViewImage(null)}>
@@ -948,9 +955,10 @@ function MyInfoTab({
   onSave,
 }: {
   profile: StudentProfile;
-  onSave: (patch: Partial<StudentProfile>) => void;
+  onSave: (patch: Partial<StudentProfile>) => Promise<void>;
 }) {
-  const [form, setForm] = useState(profile);
+  const [form, setForm] = useState<Partial<StudentProfile> | Record<string, any>>(profile);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => setForm(profile), [profile]);
 
@@ -966,9 +974,12 @@ function MyInfoTab({
       <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
       <input
         type={type}
-        value={form[key] as string | number}
+        value={form[key] !== undefined && form[key] !== null ? form[key] : ""}
         onChange={(e) =>
-          setForm({ ...form, [key]: type === "number" ? Number(e.target.value) || 0 : e.target.value })
+          setForm({
+            ...form,
+            [key]: type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value,
+          })
         }
         className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
@@ -1013,7 +1024,18 @@ function MyInfoTab({
           />
         </div>
 
-        <Button onClick={() => onSave(form)}>Save Changes</Button>
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={async () => {
+              await onSave(form as Partial<StudentProfile>);
+              setShowSuccess(true);
+              setTimeout(() => setShowSuccess(false), 3000);
+            }}
+          >
+            Save Changes
+          </Button>
+          {showSuccess && <span className="text-sm text-green-600 font-medium">Profile updated successfully!</span>}
+        </div>
       </CardContent>
     </Card>
   );
@@ -1023,15 +1045,91 @@ function MyInfoTab({
 
 export function StudentAcademicProfile() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<StudentProfile>(() => getStudentProfile());
-  const [terms, setTerms] = useState<TermGrades[]>(() => getTermGrades());
-  const [images, setImages] = useState<ResultImage[]>(() => getResultImages());
+  const [profile, setProfile] = useState<StudentProfile>(EMPTY_STUDENT_PROFILE);
+  const [terms, setTerms] = useState<TermGrades[]>([]);
+  const [images, setImages] = useState<ResultImage[]>([]);
   const [showEligibilityModal, setShowEligibilityModal] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const p = await getStudentProfile();
+        setProfile(p);
+        const t = await getTermGrades();
+        setTerms(t);
+        const img = await getResultImages();
+        setImages(img);
+      } catch (err) {
+        console.error("Failed to load academic profile:", err);
+      }
+    };
+    loadData();
+  }, []);
 
   const eligibility = checkGraduationEligibility(profile, terms);
 
-  const handleSaveProfile = (patch: Partial<StudentProfile>) => {
-    setProfile(updateStudentProfile(patch));
+  const handleSaveProfile = async (patch: Partial<StudentProfile>) => {
+    try {
+      const updated = await updateStudentProfile(patch);
+      setProfile(updated);
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+    }
+  };
+
+  const handleAddResultImage = async (img: { termName: string; imageBase64: string }) => {
+    try {
+      const newImg = await addResultImage(img);
+      setImages((prev) => [newImg, ...prev]);
+    } catch (err) {
+      console.error("Failed to add result image:", err);
+    }
+  };
+
+  const handleDeleteResultImage = async (id: string) => {
+    try {
+      await deleteResultImage(id);
+      setImages((prev) => prev.filter((img) => img.id !== id));
+    } catch (err) {
+      console.error("Failed to delete result image:", err);
+    }
+  };
+
+  const handleAddTerm = async (term: { termName: string; courses: Course[] }) => {
+    try {
+      const newTerm = await addTermGrades(term);
+      setTerms((prev) => {
+        const filtered = prev.filter((t) => t.termName !== term.termName);
+        return [newTerm, ...filtered];
+      });
+    } catch (err) {
+      console.error("Failed to add term:", err);
+    }
+  };
+
+  const handleDeleteTerm = async (id: string) => {
+    try {
+      await deleteTermGrades(id);
+      setTerms((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) {
+      console.error("Failed to delete term:", err);
+    }
+  };
+
+  const handleDeleteCourse = async (termId: string, courseId: string) => {
+    try {
+      await deleteCourseFromTerm(termId, courseId);
+      setTerms((prev) =>
+        prev.map((t) => {
+          if (t.id === termId) {
+            return { ...t, courses: t.courses.filter((c) => c.id !== courseId) };
+          }
+          return t;
+        })
+      );
+    } catch (err) {
+      console.error("Failed to delete course:", err);
+    }
   };
 
   return (
@@ -1047,7 +1145,7 @@ export function StudentAcademicProfile() {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">
-        <Tabs defaultValue="overview">
+        <Tabs defaultValue={new URLSearchParams(window.location.search).get("tab") || "overview"}>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="grades">Grades History</TabsTrigger>
@@ -1060,7 +1158,15 @@ export function StudentAcademicProfile() {
           </TabsContent>
 
           <TabsContent value="grades" className="mt-6">
-            <GradesHistoryTab images={images} setImages={setImages} terms={terms} setTerms={setTerms} />
+            <GradesHistoryTab
+              images={images}
+              onAddImage={handleAddResultImage}
+              onDeleteImage={handleDeleteResultImage}
+              terms={terms}
+              onAddTerm={handleAddTerm}
+              onDeleteTerm={handleDeleteTerm}
+              onDeleteCourse={handleDeleteCourse}
+            />
           </TabsContent>
 
           <TabsContent value="gpa" className="mt-6">
