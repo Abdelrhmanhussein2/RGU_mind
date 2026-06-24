@@ -14,5 +14,6 @@ class Student(Base):
     password      = Column(String, nullable=False)
     university_id = Column(UUID(as_uuid=True), ForeignKey("university.id"), nullable=True)
     faculty_id    = Column(UUID(as_uuid=True), ForeignKey("faculty.id"), nullable=True)
-    is_active     = Column(Boolean, default=True)
-    created_at    = Column(DateTime, default=datetime.utcnow)
+    is_active          = Column(Boolean, default=True)
+    is_email_verified = Column(Boolean, default=False)
+    created_at         = Column(DateTime, default=datetime.utcnow)

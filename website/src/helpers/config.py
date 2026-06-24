@@ -17,6 +17,9 @@ COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")
 
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+
 class Settings:
     FILE_ALLOWED_TYPES = os.getenv("FILE_ALLOWED_TYPES", "application/pdf,text/plain").split(",")
     FILE_MAX_SIZE_MB   = int(os.getenv("FILE_MAX_SIZE_MB", "50"))

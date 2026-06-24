@@ -17,4 +17,5 @@ class University(Base):
     contact_email           = Column(String(255), unique=True, nullable=False)
     password                = Column(String, nullable=False)
     is_active               = Column(Boolean, default=True)
+    is_email_verified       = Column(Boolean, default=False)
     created_at              = Column(DateTime, default=datetime.utcnow)

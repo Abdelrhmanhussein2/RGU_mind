@@ -26,3 +26,31 @@ class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: UserType
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+    role: UserType
+
+
+class VerifyOtpRequest(BaseModel):
+    email: EmailStr
+    role: UserType
+    otp: str
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    role: UserType
+    otp: str
+    new_password: str
+
+class VerifyRegisterOtpRequest(BaseModel):
+    email: EmailStr
+    role: UserType
+    otp: str
+
+
+class ResendRegisterOtpRequest(BaseModel):
+    email: EmailStr
+    role: UserType

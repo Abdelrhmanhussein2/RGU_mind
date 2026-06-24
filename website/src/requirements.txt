@@ -16,3 +16,4 @@ pyjwt
 python-multipart
 cohere
 qdrant-client
+redis

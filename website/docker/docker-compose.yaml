@@ -15,7 +15,11 @@ services:
       - "6333:6333"
     volumes:
       - qdrant_data:/qdrant/storage
-
+  redis:
+    image: redis:7
+    container_name: Rgu_mind_redis
+    ports:
+      - "6379:6379"
   server:
     build:
       context: ../src
@@ -27,6 +31,7 @@ services:
     depends_on:
       - postgres
       - qdrant
+      - redis
     volumes:
       - ../src:/app
 
