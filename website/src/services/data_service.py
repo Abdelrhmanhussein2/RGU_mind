@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import UploadFile
 from uuid import UUID
-from models import Document, Regulation
+from models import Document, Regulation, Department, Faculty, Chunk
+from services.embedding_service import embedding_service
 import os
 
 
@@ -36,5 +37,24 @@ class RegulationService:
 
         return new_regulation, new_document
 
+    async def reset_department_content(self, department_id: UUID, db: Session):
+        # 1. Get all regulations for this department
+        regulations = db.query(Regulation).filter(Regulation.department_id == department_id).all()
+        if not regulations:
+            return {"message": "No content found for this department (no regulations)."}
+            
+        regulation_ids = [r.id for r in regulations]
+        
+        # 2. Get all documents for these regulations
+        documents = db.query(Document).filter(Document.regulation_id.in_(regulation_ids)).all()
+        document_ids = [d.id for d in documents]
+        
+        # 3. Delete vectors from Qdrant
+        if document_ids:
+            embedding_service.delete_embedding_documents(document_ids)
+            
+        return {"message": "Department Qdrant embeddings have been completely reset."}
+
 
 regulation_service = RegulationService()
+

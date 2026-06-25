@@ -27,7 +27,8 @@ class AdminController:
                 "university": {
                     "id": str(university.id),
                     "name": university.name,
-                    "status": university.status
+                    "status": university.status,
+                    "verification_file_url": university.verification_file_url
                 }
             }
         except PermissionError as e:

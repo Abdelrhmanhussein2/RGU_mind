@@ -43,4 +43,18 @@ class DataController(BaseController):
             },
             status_code=200
         )
+
+    async def reset_content(self, department_id: UUID, db: Session):
+        try:
+            result = await regulation_service.reset_department_content(department_id, db)
+            return JSONResponse(
+                content={"status": "success", "message": result["message"]},
+                status_code=200
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to reset content: {str(e)}"
+            )
+
 data_controller = DataController()

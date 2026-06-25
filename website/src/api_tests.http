@@ -113,3 +113,15 @@ x-admin-id: <PASTE_ADMIN_ID_HERE>
 ### 9. Admin: Reject University
 POST {{baseUrl}}/admin/reject-university/<PASTE_UNIVERSITY_ID_HERE>
 x-admin-id: <PASTE_ADMIN_ID_HERE>
+
+###
+
+### 10. Retrieval
+POST {{baseUrl}}/retrieval
+Content-Type: application/json
+
+{
+    "query": "what is this document about?",
+    "Top_k": 5,
+    "department_id": "{{departmentId}}"
+}
