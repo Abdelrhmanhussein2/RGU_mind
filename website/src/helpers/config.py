@@ -16,6 +16,7 @@ POSTGRES_DB       = os.getenv("POSTGRES_DB", "regumind")
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")
+GROQ_API_KEY = os.getenv("GROK_API_KEY")
 
 REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))

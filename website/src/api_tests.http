@@ -116,12 +116,12 @@ x-admin-id: <PASTE_ADMIN_ID_HERE>
 
 ###
 
-### 10. Retrieval
-POST {{baseUrl}}/retrieval
+### 10. Retrieval Answer
+POST {{baseUrl}}/retrieval/answer
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
     "query": "what is this document about?",
-    "Top_k": 5,
-    "department_id": "{{departmentId}}"
+    "Top_k": 5
 }
