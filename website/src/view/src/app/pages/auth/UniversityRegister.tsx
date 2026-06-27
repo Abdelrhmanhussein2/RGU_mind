@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Mail, Lock, Building2, User, Hash, MapPin, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Building2, User, Hash, MapPin, Eye, EyeOff, FileText } from "lucide-react";
 import { AuthLayout } from "../../components/auth/AuthLayout";
 import { PasswordStrengthIndicator } from "../../components/auth/PasswordStrengthIndicator";
 import { registerUniversity } from "../../../services/authService";
@@ -22,11 +22,16 @@ export function UniversityRegister() {
     password: "",
     confirmPassword: "",
   });
+  const [verificationFile, setVerificationFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+      return;
+    }
+    if (!verificationFile) {
+      setError("University verification document is required");
       return;
     }
     setError("");
@@ -39,7 +44,8 @@ export function UniversityRegister() {
         formData.universityCode,
         formData.deanName,
         formData.governorate,
-        formData.password
+        formData.password,
+        verificationFile
       );
       login(user, token);
       navigate("/university");
@@ -152,6 +158,25 @@ export function UniversityRegister() {
                 required
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              University Verification Document (PDF)
+            </label>
+            <div className="relative">
+              <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => setVerificationFile(e.target.files?.[0] ?? null)}
+                className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                required
+              />
+            </div>
+            {verificationFile && (
+              <p className="text-xs text-purple-600 mt-1.5">Selected: {verificationFile.name}</p>
+            )}
           </div>
 
           <div>

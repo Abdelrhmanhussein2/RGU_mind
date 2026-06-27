@@ -4,13 +4,10 @@ import { Mail, Lock, User, Building2, Eye, EyeOff, ChevronDown, IdCard, BookOpen
 import { AuthLayout } from "../../components/auth/AuthLayout";
 import { PasswordStrengthIndicator } from "../../components/auth/PasswordStrengthIndicator";
 import { registerStudent } from "../../../services/authService";
-import { useAuth } from "../../../store/authStore";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "../../components/ui/collapsible";
-import { createStudentProfile } from "../../lib/studentProfile";
 
 export function StudentRegister() {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,26 +57,32 @@ export function StudentRegister() {
         formData.email,
         formData.password
       );
-      login(user, token);
 
-      // 🔌 BACKEND: POST /student/profile
-      await createStudentProfile({
-        fullName: formData.fullName,
-        studentId: formData.studentId,
-        university: formData.university,
-        faculty: formData.faculty,
-        department: formData.department,
-        enrollmentYear: formData.enrollmentYear,
-        expectedGraduationYear: formData.expectedGraduationYear,
-        totalRequiredCreditHours: academicPlan.totalRequiredCreditHours,
-        mandatoryCreditHours: academicPlan.mandatoryCreditHours,
-        electiveCreditHours: academicPlan.electiveCreditHours,
-        majorCreditHours: academicPlan.majorCreditHours,
-        curriculumPdfName: curriculumPdf?.name,
-        curriculumPdfBase64: curriculumPdf?.base64,
+      // Registration requires OTP verification before the account is fully active —
+      // user/token from this response are carried forward and only applied via login()
+      // once verify-register-otp succeeds (see StudentRegisterOtp.tsx).
+      navigate("/student/verify-register-otp", {
+        state: {
+          email: formData.email,
+          user,
+          token,
+          profileData: {
+            fullName: formData.fullName,
+            studentId: formData.studentId,
+            university: formData.university,
+            faculty: formData.faculty,
+            department: formData.department,
+            enrollmentYear: formData.enrollmentYear,
+            expectedGraduationYear: formData.expectedGraduationYear,
+            totalRequiredCreditHours: academicPlan.totalRequiredCreditHours,
+            mandatoryCreditHours: academicPlan.mandatoryCreditHours,
+            electiveCreditHours: academicPlan.electiveCreditHours,
+            majorCreditHours: academicPlan.majorCreditHours,
+            curriculumPdfName: curriculumPdf?.name,
+            curriculumPdfBase64: curriculumPdf?.base64,
+          },
+        },
       });
-
-      navigate("/student/chat");
     } catch {
       setError("Registration failed. Please try again.");
     } finally {

@@ -4,11 +4,13 @@ import { Landing } from "./pages/Landing";
 import { UniversityDashboard } from "./pages/UniversityDashboard";
 import { StudentChat } from "./pages/StudentChat";
 import { StudentAcademicProfile } from "./pages/StudentAcademicProfile";
+import { NotificationsPage } from "./pages/NotificationsPage";
 import { AdminDashboard } from "./pages/AdminDashboard";
 
 // Student Authentication Pages
 import { StudentSignIn } from "./pages/auth/StudentSignIn";
 import { StudentRegister } from "./pages/auth/StudentRegister";
+import { StudentRegisterOtp } from "./pages/auth/StudentRegisterOtp";
 import { StudentForgotPassword } from "./pages/auth/StudentForgotPassword";
 import { StudentOtpVerification } from "./pages/auth/StudentOtpVerification";
 import { StudentResetPassword } from "./pages/auth/StudentResetPassword";
@@ -39,6 +41,12 @@ const studentAcademicProfile = createElement(
   createElement(StudentAcademicProfile)
 );
 
+const studentNotifications = createElement(
+  ProtectedRoute,
+  { requiredRole: "student" },
+  createElement(NotificationsPage)
+);
+
 const universityDashboard = createElement(
   ProtectedRoute,
   { requiredRole: "university" },
@@ -67,6 +75,10 @@ export const router = createBrowserRouter([
     Component: StudentRegister,
   },
   {
+    path: "/student/verify-register-otp",
+    Component: StudentRegisterOtp,
+  },
+  {
     path: "/student/forgot-password",
     Component: StudentForgotPassword,
   },
@@ -87,6 +99,10 @@ export const router = createBrowserRouter([
   {
     path: "/student/academic-profile",
     element: studentAcademicProfile,
+  },
+  {
+    path: "/student/notifications",
+    element: studentNotifications,
   },
 
   // University Auth Routes (public)

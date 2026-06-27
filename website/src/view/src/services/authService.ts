@@ -60,13 +60,26 @@ export async function registerStudent(
   };
 }
 
+// 🔌 BACKEND: POST /auth/verify-register-otp { email, role, otp } — backend response is { message },
+// not { token, user }; the registration token/user come from registerStudent() and are carried
+// forward through navigation state to be used by login() once this verification succeeds.
+export async function verifyRegisterOtp(email: string, otp: string): Promise<void> {
+  await api.post("/auth/verify-register-otp", { email, role: "student", otp });
+}
+
+// 🔌 BACKEND: POST /auth/resend-register-otp { email, role }
+export async function resendRegisterOtp(email: string): Promise<void> {
+  await api.post("/auth/resend-register-otp", { email, role: "student" });
+}
+
 export async function registerUniversity(
   universityName: string,
   officialEmail: string,
   universityCode: string,
   deanName: string,
   governorate: string,
-  password: string
+  password: string,
+  verificationFile: File
 ): Promise<AuthResponse> {
   const formData = new FormData();
   formData.append("name", universityName);
@@ -74,10 +87,7 @@ export async function registerUniversity(
   formData.append("country", governorate);
   formData.append("contact_email", officialEmail);
   formData.append("password", password);
-
-  // Send a dummy file to satisfy backend verification_file requirement
-  const dummyFile = new Blob(["Verification document details for Dean " + deanName], { type: "text/plain" });
-  formData.append("verification_file", dummyFile, "verification.txt");
+  formData.append("verification_file", verificationFile);
 
   const response = await api.post("/auth/university/register", formData, {
     headers: { "Content-Type": "multipart/form-data" },

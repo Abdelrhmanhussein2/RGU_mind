@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
   ArrowLeft,
@@ -85,6 +85,15 @@ import {
   checkGraduationEligibility,
   GraduationEligibility,
 } from "../lib/academicStanding";
+import {
+  CurriculumCourse,
+  CourseStatus,
+  getCurriculum,
+  getPassedCurriculumIds,
+  getCourseStatus,
+  findPassedCourseDetail,
+} from "../lib/curriculum";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../components/ui/tooltip";
 
 function readFileAsBase64(file: File): Promise<string> {
   return new Promise((resolve) => {
@@ -618,10 +627,10 @@ function GradesHistoryTab({
               <Card key={img.id} className="overflow-hidden">
                 <button
                    type="button"
-                   onClick={() => setViewImage(img.imageBase64)}
+                   onClick={() => setViewImage(img.imageUrl ?? img.imageBase64 ?? null)}
                    className="block w-full h-36 bg-gray-100"
                 >
-                  <img src={img.imageBase64} alt={img.termName} className="w-full h-full object-cover" />
+                  <img src={img.imageUrl ?? img.imageBase64} alt={img.termName} className="w-full h-full object-cover" />
                 </button>
                 <CardContent className="pt-4 flex items-start justify-between">
                   <div>
@@ -1041,6 +1050,163 @@ function MyInfoTab({
   );
 }
 
+/* ───────────────────────── Curriculum Map tab ───────────────────────── */
+
+function CourseDetailDialog({
+  course,
+  curriculum,
+  onOpenChange,
+}: {
+  course: CurriculumCourse | null;
+  curriculum: CurriculumCourse[];
+  onOpenChange: () => void;
+}) {
+  const prereqNames = course?.prerequisites.map((id) => curriculum.find((c) => c.id === id)?.name ?? id) ?? [];
+
+  return (
+    <Dialog open={!!course} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{course?.name}</DialogTitle>
+          <DialogDescription>
+            Year {course?.year} · Semester {course?.semester}
+          </DialogDescription>
+        </DialogHeader>
+        {course && (
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">Credit Hours</span>
+              <span className="font-medium text-gray-900">{course.creditHours}</span>
+            </div>
+            <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">Category</span>
+              <span className="font-medium text-gray-900 capitalize">{course.category.replace("_", " ")}</span>
+            </div>
+            <div className="px-3 py-2 bg-gray-50 rounded-lg">
+              <span className="text-gray-600">Prerequisites</span>
+              <p className="font-medium text-gray-900 mt-1">
+                {prereqNames.length === 0 ? "None" : prereqNames.join(", ")}
+              </p>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function CourseNode({
+  course,
+  status,
+  curriculum,
+  passedDetail,
+  onClick,
+}: {
+  course: CurriculumCourse;
+  status: CourseStatus;
+  curriculum: CurriculumCourse[];
+  passedDetail: { grade: string; termName: string } | null;
+  onClick: () => void;
+}) {
+  const styles: Record<CourseStatus, string> = {
+    passed: "bg-green-50 border-green-300 text-green-800",
+    available: "bg-blue-50 border-blue-300 text-blue-800 cursor-pointer hover:border-blue-500 hover:shadow-sm",
+    locked: "bg-gray-50 border-gray-200 text-gray-400",
+  };
+
+  const node = (
+    <div
+      onClick={status === "available" ? onClick : undefined}
+      className={`px-3 py-2.5 rounded-lg border text-sm transition-all ${styles[status]}`}
+    >
+      <p className="font-medium">{course.name}</p>
+      <p className="text-xs opacity-75 mt-0.5">{course.creditHours} credit hours</p>
+    </div>
+  );
+
+  if (status === "locked") {
+    const prereqNames = course.prerequisites.map((id) => curriculum.find((c) => c.id === id)?.name ?? id);
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{node}</TooltipTrigger>
+        <TooltipContent>Requires: {prereqNames.length ? prereqNames.join(", ") : "None"}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  if (status === "passed" && passedDetail) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{node}</TooltipTrigger>
+        <TooltipContent>
+          Grade: {passedDetail.grade} · {passedDetail.termName}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return node;
+}
+
+function CurriculumMapTab({ terms }: { terms: TermGrades[] }) {
+  const curriculum = useMemo(() => getCurriculum(), []);
+  const passedIds = useMemo(() => getPassedCurriculumIds(curriculum, terms), [curriculum, terms]);
+  const [selectedCourse, setSelectedCourse] = useState<CurriculumCourse | null>(null);
+  const years = Array.from(new Set(curriculum.map((c) => c.year))).sort((a, b) => a - b);
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center gap-5 text-xs text-gray-500">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-green-400" /> Passed
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> Available
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-gray-300" /> Locked
+        </span>
+      </div>
+
+      {years.map((year) => (
+        <div key={year}>
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Year {year}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {[1, 2].map((semester) => (
+              <div key={semester} className="space-y-2">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Semester {semester}</p>
+                <div className="space-y-2">
+                  {curriculum
+                    .filter((c) => c.year === year && c.semester === semester)
+                    .map((course) => {
+                      const status = getCourseStatus(course, passedIds);
+                      return (
+                        <CourseNode
+                          key={course.id}
+                          course={course}
+                          status={status}
+                          curriculum={curriculum}
+                          passedDetail={status === "passed" ? findPassedCourseDetail(course, terms) : null}
+                          onClick={() => setSelectedCourse(course)}
+                        />
+                      );
+                    })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <CourseDetailDialog
+        course={selectedCourse}
+        curriculum={curriculum}
+        onOpenChange={() => setSelectedCourse(null)}
+      />
+    </div>
+  );
+}
+
 /* ───────────────────────── Page ───────────────────────── */
 
 export function StudentAcademicProfile() {
@@ -1151,6 +1317,7 @@ export function StudentAcademicProfile() {
             <TabsTrigger value="grades">Grades History</TabsTrigger>
             <TabsTrigger value="gpa">GPA Calculator</TabsTrigger>
             <TabsTrigger value="info">My Info</TabsTrigger>
+            <TabsTrigger value="curriculum">Curriculum Map</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -1175,6 +1342,10 @@ export function StudentAcademicProfile() {
 
           <TabsContent value="info" className="mt-6">
             <MyInfoTab profile={profile} onSave={handleSaveProfile} />
+          </TabsContent>
+
+          <TabsContent value="curriculum" className="mt-6">
+            <CurriculumMapTab terms={terms} />
           </TabsContent>
         </Tabs>
       </main>

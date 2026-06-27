@@ -202,6 +202,13 @@ export function StudentChat() {
             <span className="text-sm font-medium">Academic Profile</span>
           </button>
           <button
+            onClick={() => navigate("/student/notifications")}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
+          >
+            <Bell className="w-5 h-5" />
+            <span className="text-sm font-medium">Notifications</span>
+          </button>
+          <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
           >
@@ -242,7 +249,7 @@ export function StudentChat() {
                 {notifications.length === 0 ? (
                   <p className="px-4 py-6 text-sm text-gray-500 text-center">No notifications</p>
                 ) : (
-                  notifications.map((n) => (
+                  notifications.slice(0, 3).map((n) => (
                     <button
                       key={n.id}
                       onClick={() => handleNotificationClick(n.id)}
@@ -264,6 +271,12 @@ export function StudentChat() {
                   ))
                 )}
               </div>
+              <button
+                onClick={() => navigate("/student/notifications")}
+                className="w-full text-center px-4 py-2.5 text-sm text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-medium border-t border-gray-100 transition-colors"
+              >
+                View all notifications →
+              </button>
             </PopoverContent>
           </Popover>
         </div>

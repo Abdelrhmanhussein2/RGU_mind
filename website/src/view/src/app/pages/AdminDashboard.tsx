@@ -27,9 +27,15 @@ import {
   approveRegulation,
   rejectRegulation,
 } from "../lib/adminRegulations";
+import {
+  UniversitySubmission,
+  getUniversitySubmissions,
+  approveUniversity,
+  rejectUniversity,
+} from "../lib/adminUniversities";
 import api from "../../services/api";
 
-type Tab = "pending" | "approved" | "rejected" | "settings";
+type Tab = "pending" | "approved" | "rejected" | "universities" | "settings";
 
 function RegulationCard({
   regulation,
@@ -78,6 +84,7 @@ export function AdminDashboard() {
   const { state, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("pending");
   const [regulations, setRegulations] = useState<RegulationSubmission[]>([]);
+  const [universities, setUniversities] = useState<UniversitySubmission[]>([]);
   const [rejectTarget, setRejectTarget] = useState<RegulationSubmission | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [profile, setProfile] = useState({
@@ -91,13 +98,20 @@ export function AdminDashboard() {
     setRegulations(data);
   };
 
+  const loadUniversities = async () => {
+    const data = await getUniversitySubmissions();
+    setUniversities(data);
+  };
+
   useEffect(() => {
     loadRegulations();
+    loadUniversities();
   }, []);
 
   const pending = regulations.filter((r) => r.status === "pending");
   const approved = regulations.filter((r) => r.status === "approved");
   const rejected = regulations.filter((r) => r.status === "rejected");
+  const pendingUniversities = universities.filter((u) => u.status === "pending");
 
   const handleApprove = async (id: string) => {
     try {
@@ -117,6 +131,24 @@ export function AdminDashboard() {
       await loadRegulations();
     } catch (err) {
       console.error("Failed to reject regulation:", err);
+    }
+  };
+
+  const handleApproveUniversity = async (id: string) => {
+    try {
+      await approveUniversity(id);
+      await loadUniversities();
+    } catch (err) {
+      console.error("Failed to approve university:", err);
+    }
+  };
+
+  const handleRejectUniversity = async (id: string) => {
+    try {
+      await rejectUniversity(id);
+      await loadUniversities();
+    } catch (err) {
+      console.error("Failed to reject university:", err);
     }
   };
 
@@ -156,6 +188,7 @@ export function AdminDashboard() {
     { id: "pending", label: "Pending Review", icon: Clock, count: pending.length },
     { id: "approved", label: "Approved", icon: CheckCircle2, count: approved.length },
     { id: "rejected", label: "Rejected", icon: XCircle, count: rejected.length },
+    { id: "universities", label: "Pending Universities", icon: Building2, count: pendingUniversities.length },
     { id: "settings", label: "Settings", icon: SettingsIcon },
   ];
 
@@ -257,6 +290,43 @@ export function AdminDashboard() {
               <p className="text-gray-500">No rejected regulations.</p>
             ) : (
               rejected.map((r) => <RegulationCard key={r.id} regulation={r} />)
+            )}
+          </div>
+        )}
+
+        {activeTab === "universities" && (
+          <div className="space-y-4 max-w-3xl">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Pending Universities</h2>
+            {pendingUniversities.length === 0 ? (
+              <p className="text-gray-500">No universities awaiting approval.</p>
+            ) : (
+              pendingUniversities.map((u) => (
+                <Card key={u.id}>
+                  <CardContent className="pt-6 flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{u.name}</p>
+                        <p className="text-sm text-gray-500 mt-1">{u.contactEmail} · {u.country}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Submitted {new Date(u.submittedDate).toLocaleDateString()}
+                          {u.verificationFileUrl && <> · {u.verificationFileUrl}</>}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button size="sm" onClick={() => handleApproveUniversity(u.id)}>
+                        Approve
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleRejectUniversity(u.id)}>
+                        Reject
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
             )}
           </div>
         )}
