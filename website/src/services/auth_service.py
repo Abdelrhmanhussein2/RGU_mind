@@ -9,6 +9,7 @@ from helpers.otp import generate_otp, build_otp_key, hash_otp, verify_otp, OTP_T
 from fastapi import HTTPException
 import os
 import shutil
+import json
 
 class AuthService:
     def get_user_by_email_and_role(self, email: str, role: str, db: Session):
@@ -35,6 +36,10 @@ class AuthService:
             hash_otp(otp)
         )
 
+        print(f"\n[DEV ONLY] Password Reset OTP for {request.email}: {otp}\n", flush=True)
+        from helpers.email import send_otp_email
+        send_otp_email(request.email, otp, purpose="Password Reset")
+
         return {
             "message": "OTP sent successfully",
             "dev_otp": otp
@@ -53,18 +58,21 @@ class AuthService:
             hash_otp(otp)
         )
 
+        print(f"\n[DEV ONLY] Registration OTP for {email}: {otp}\n", flush=True)
+        from helpers.email import send_otp_email
+        send_otp_email(email, otp, purpose="Registration")
+
         return {
             "message": "Registration OTP sent successfully",
             "dev_otp": otp
         }
+
     
     def verify_register_otp(self, request, db: Session):
-        user = self.get_user_by_email_and_role(request.email, request.role.value, db)
+        email_lower = request.email.lower()
+        role = request.role.value
 
-        if not user:
-            raise ValueError("User not found")
-
-        otp_key = build_otp_key("register", request.role.value, request.email)
+        otp_key = build_otp_key("register", role, email_lower)
         hashed_otp = redis_client.get(otp_key)
 
         if not hashed_otp:
@@ -73,14 +81,51 @@ class AuthService:
         if not verify_otp(request.otp, hashed_otp):
             raise PermissionError("Invalid OTP")
 
-        user.is_email_verified = True
+        # OTP is valid — now create the user in the DB if student
+        user = None
+        if role == "student":
+            pending_key = f"pending_registration:student:{email_lower}"
+            pending_data_raw = redis_client.get(pending_key)
+            if pending_data_raw:
+                pending_data = json.loads(pending_data_raw)
+                existing = db.query(Student).filter(Student.email == email_lower).first()
+                if not existing:
+                    student = Student(
+                        name=pending_data["name"],
+                        email=pending_data["email"],
+                        password=pending_data["password"],
+                        university_id=pending_data.get("university_id"),
+                        faculty_id=pending_data.get("faculty_id"),
+                        is_email_verified=True
+                    )
+                    db.add(student)
+                    db.commit()
+                    db.refresh(student)
+                    user = student
+                else:
+                    existing.is_email_verified = True
+                    db.commit()
+                    user = existing
+                redis_client.delete(pending_key)
+            else:
+                # Fallback: student already in DB (old flow or resend scenario)
+                user = db.query(Student).filter(Student.email == email_lower).first()
+                if user:
+                    user.is_email_verified = True
+                    db.commit()
+
+        elif role == "university":
+            user = db.query(University).filter(University.contact_email == email_lower).first()
+            if user:
+                user.is_email_verified = True
+                db.commit()
 
         redis_client.delete(otp_key)
 
-        db.commit()
-        db.refresh(user)
+        if not user:
+            raise ValueError("Failed to create or find user during verification")
 
-        return {
+        return user, {
             "message": "Email verified successfully"
         }
     def verify_password_reset_otp(self, request, db: Session):
@@ -130,42 +175,66 @@ class AuthService:
 
     
     def register_student(self, request, db: Session):
-        existing_student = db.query(Student).filter(Student.email == request.email).first()
+        email_lower = request.email.lower()
 
-        if existing_student:
+        # Check if email already exists and is verified
+        existing_student = db.query(Student).filter(Student.email == email_lower).first()
+        if existing_student and existing_student.is_email_verified:
             raise ValueError("Email already exists")
-        
+
+        # If unverified record exists, remove it so we can re-register cleanly
+        if existing_student and not existing_student.is_email_verified:
+            db.delete(existing_student)
+            db.commit()
+
         university_id = None
         faculty_id = None
 
         if request.university_name:
-            university = db.query(University).filter(University.name == request.university_name).first()
+            uni_name = request.university_name.strip()
+            university = db.query(University).filter(University.name.ilike(uni_name)).first()
+            if not university:
+                clean_name = uni_name.lower().replace("university", "").strip()
+                university = db.query(University).filter(University.name.ilike(f"%{clean_name}%")).first()
             if university:
                 university_id = university.id
-                
                 if request.faculty:
+                    fac_name = request.faculty.strip()
                     faculty = db.query(Faculty).filter(
-                        Faculty.name == request.faculty,
+                        Faculty.name.ilike(fac_name),
                         Faculty.university_id == university.id
                     ).first()
+                    if not faculty:
+                        clean_fac = fac_name.lower().replace("faculty of", "").replace("faculty", "").strip()
+                        faculty = db.query(Faculty).filter(
+                            Faculty.name.ilike(f"%{clean_fac}%"),
+                            Faculty.university_id == university.id
+                        ).first()
                     if faculty:
                         faculty_id = faculty.id
 
-        student = Student(
-            name=request.username,
-            email=request.email,
-            password=hash_password(request.password),
-            university_id=university_id,
-            faculty_id=faculty_id
-        )
+        # Store registration data in Redis temporarily (NOT in DB yet)
+        pending_key = f"pending_registration:student:{email_lower}"
+        pending_data = {
+            "name": request.username,
+            "email": email_lower,
+            "password": hash_password(request.password),
+            "university_id": str(university_id) if university_id else None,
+            "faculty_id": str(faculty_id) if faculty_id else None,
+        }
+        redis_client.setex(pending_key, OTP_TTL_SECONDS, json.dumps(pending_data))
 
-        db.add(student)
-        db.commit()
-        db.refresh(student)
+        # Generate OTP and send email
+        otp = generate_otp()
+        otp_key = build_otp_key("register", "student", email_lower)
+        redis_client.setex(otp_key, OTP_TTL_SECONDS, hash_otp(otp))
 
-        otp_result = self.request_register_otp(student.email, "student", db)
+        print(f"\n[DEV ONLY] Registration OTP for {email_lower}: {otp}\n", flush=True)
+        from helpers.email import send_otp_email
+        send_otp_email(email_lower, otp, purpose="Registration")
 
-        return student, otp_result
+        return None, {"message": "Registration OTP sent successfully", "dev_otp": otp}
+
 
 
     def login_student(self, request, db: Session):
@@ -184,7 +253,7 @@ class AuthService:
     def register_university(self, request, verification_file, db: Session):
 
         existing_university = db.query(University).filter(
-            (University.contact_email == request.contact_email) |
+            (University.contact_email == request.contact_email.lower()) |
             (University.slug == request.slug)
         ).first()
 
@@ -202,7 +271,7 @@ class AuthService:
             name=request.name,
             slug=request.slug,
             country=request.country,
-            contact_email=request.contact_email,
+            contact_email=request.contact_email.lower(),
             password=hash_password(request.password),
             verification_file_url=file_path,
             status="pending"

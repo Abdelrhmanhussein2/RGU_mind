@@ -37,7 +37,6 @@ export function UniversityRegister() {
     setError("");
     setIsLoading(true);
     try {
-      // 🔌 BACKEND: replace mock with real registerUniversity call
       const { user, token } = await registerUniversity(
         formData.universityName,
         formData.officialEmail,
@@ -47,10 +46,20 @@ export function UniversityRegister() {
         formData.password,
         verificationFile
       );
-      login(user, token);
-      navigate("/university");
-    } catch {
-      setError("Registration failed. Please try again.");
+      
+      navigate("/university/verify-register-otp", {
+        state: {
+          email: formData.officialEmail,
+          user,
+          token
+        }
+      });
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Registration failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

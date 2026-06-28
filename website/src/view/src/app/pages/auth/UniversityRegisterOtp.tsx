@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { AuthLayout } from "../../components/auth/AuthLayout";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
-import { verifyOtp } from "../../../services/authService";
+import { verifyRegisterOtp, resendRegisterOtp } from "../../../services/authService";
 
-export function StudentOtpVerification() {
+export function UniversityRegisterOtp() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "your email";
@@ -25,30 +25,38 @@ export function StudentOtpVerification() {
     setError("");
     setIsLoading(true);
     try {
-      // 🔌 BACKEND: replace mock with real verifyOtp call
-      await verifyOtp(email, otp, "student");
-      navigate("/student/reset-password", { state: { email, otp } });
-    } catch {
-      setError("Invalid or expired code. Please try again.");
+      await verifyRegisterOtp(email, otp, "university");
+      navigate("/university/pending-approval");
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Invalid or expired code.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setCanResend(false);
+    try {
+      await resendRegisterOtp(email, "university");
+    } catch {
+      // ignore — cooldown still resets below so the user can retry
+    }
     setTimeout(() => setCanResend(true), 30000);
   };
 
   return (
     <AuthLayout
-      variant="student"
-      title="Verify Your Identity"
-      subtitle="We've sent a 6-digit verification code to your email. Please enter it below to continue."
+      variant="university"
+      title="Verify University Identity"
+      subtitle="We've sent a 6-digit verification code to your official email. Enter it below to finish verifying your email address."
     >
       <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
         <button
-          onClick={() => navigate("/student/forgot-password")}
+          onClick={() => navigate("/university/register")}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -99,7 +107,7 @@ export function StudentOtpVerification() {
               type="button"
               onClick={handleResend}
               disabled={!canResend}
-              className="text-indigo-600 hover:text-indigo-700 font-medium text-sm disabled:text-gray-400 disabled:cursor-not-allowed"
+              className="text-purple-600 hover:text-purple-700 font-medium text-sm disabled:text-gray-400 disabled:cursor-not-allowed"
             >
               {canResend ? "Resend Code" : "Resend in 30s"}
             </button>
@@ -108,7 +116,7 @@ export function StudentOtpVerification() {
           <button
             type="submit"
             disabled={otp.length !== 6 || isLoading}
-            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Verifying..." : "Verify Code"}
           </button>

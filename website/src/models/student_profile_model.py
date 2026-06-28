@@ -15,9 +15,4 @@ class StudentProfile(Base):
     department                  = Column(String(255), nullable=False)
     enrollment_year             = Column(Integer, nullable=False)
     expected_graduation_year    = Column(Integer, nullable=False)
-    total_required_credit_hours = Column(Integer, default=0, nullable=False)
-    mandatory_credit_hours      = Column(Integer, default=0, nullable=False)
-    elective_credit_hours       = Column(Integer, default=0, nullable=False)
-    major_credit_hours          = Column(Integer, default=0, nullable=False)
-    curriculum_pdf_name         = Column(String(500), nullable=True)
-    curriculum_pdf_path         = Column(String(1000), nullable=True)
+

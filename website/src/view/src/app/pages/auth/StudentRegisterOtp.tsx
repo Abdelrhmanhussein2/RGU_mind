@@ -31,19 +31,26 @@ export function StudentRegisterOtp() {
     setError("");
     setIsLoading(true);
     try {
-      await verifyRegisterOtp(email, otp);
+      const response = await verifyRegisterOtp(email, otp, "student");
 
-      if (user && token) {
-        login(user, token);
-      }
+      // Force localStorage update synchronously so api interceptor picks it up immediately
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
+
+      // Update React state
+      login(response.user, response.token);
+
       if (profileData) {
-        // 🔌 BACKEND: POST /student/profile
         await createStudentProfile(profileData);
       }
 
       navigate("/student/chat");
-    } catch {
-      setError("Invalid or expired code. Please try again.");
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Invalid or expired code, or profile creation failed.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +59,7 @@ export function StudentRegisterOtp() {
   const handleResend = async () => {
     setCanResend(false);
     try {
-      await resendRegisterOtp(email);
+      await resendRegisterOtp(email, "student");
     } catch {
       // ignore — cooldown still resets below so the user can retry
     }

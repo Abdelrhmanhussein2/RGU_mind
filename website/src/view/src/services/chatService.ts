@@ -18,46 +18,26 @@ export interface ChatHistoryItem {
   timestamp: string;
 }
 
-// 🔌 BACKEND: POST /chat  { question }  → { answer, sources }  ⚠️ NOT YET IMPLEMENTED in backend
 export async function sendMessage(
   question: string
 ): Promise<{ answer: string; sources: Source[] }> {
-  void api; // will be: return (await api.post("/chat", { question })).data
-  return new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve({
-          answer: `Based on the university's academic regulations, here is the answer to your question about "${question}".\n\nPlease consult official documentation for the most up-to-date information.`,
-          sources: [
-            {
-              title: "Academic Regulations 2024",
-              section: "Section 1.1: General Provisions",
-            },
-          ],
-        }),
-      1500
-    )
-  );
+  const response = await api.post("/retrieval/answer", { query: question });
+  const data = response.data.data;
+
+  return {
+    answer: data.answer,
+    sources: data.sources?.map((s: any) => ({
+      title: s.source_document || "Document",
+      section: `Page ${s.page_number || "N/A"}`,
+    })) || []
+  };
 }
 
-// 🔌 BACKEND: GET /chat/history  → ChatHistoryItem[]  ⚠️ NOT YET IMPLEMENTED in backend
 export async function getChatHistory(): Promise<ChatHistoryItem[]> {
-  void api; // will be: return (await api.get("/chat/history")).data
-  return new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve([
-          { id: "1", title: "Course retake policy", timestamp: "2 hours ago" },
-          { id: "2", title: "Maximum credit hours", timestamp: "Yesterday" },
-          { id: "3", title: "Grading system questions", timestamp: "3 days ago" },
-        ]),
-      300
-    )
-  );
+  // Chat history is not yet implemented on the backend.
+  return [];
 }
 
-// 🔌 BACKEND: DELETE /chat/history/:id  ⚠️ NOT YET IMPLEMENTED in backend
 export async function deleteChatHistory(id: string): Promise<void> {
-  void api; // will be: await api.delete(`/chat/history/${id}`)
-  return new Promise((resolve) => setTimeout(resolve, 300));
+  // Not yet implemented on backend
 }

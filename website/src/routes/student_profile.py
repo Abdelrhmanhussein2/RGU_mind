@@ -4,8 +4,10 @@ import base64
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from helpers.config import get_db
+from sqlalchemy import func
 from helpers.security import get_current_student
 from models.user_model import Student
+from models.academic_plan_model import AcademicPlan
 from schemes.student_profile_schemes import StudentProfileRequest, StudentProfileResponse
 from services.student_profile_service import student_profile_service
 
@@ -31,18 +33,14 @@ async def create_profile(
     student: Student = Depends(get_current_student),
     db: Session = Depends(get_db)
 ):
-    pdf_path = None
-    if profile_req.curriculumPdfName and hasattr(profile_req, "curriculumPdfBase64") and getattr(profile_req, "curriculumPdfBase64"):
-        pdf_base64 = getattr(profile_req, "curriculumPdfBase64")
-        pdf_path = save_base64_file(pdf_base64, profile_req.curriculumPdfName)
-
     try:
         profile = student_profile_service.create_or_update_profile(
             student_id=student.id,
             profile_req=profile_req,
-            curriculum_pdf_path=pdf_path,
+            curriculum_pdf_path=None,
             db=db
         )
+        plan = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(profile.department)).first()
         return StudentProfileResponse(
             fullName=student.name,
             studentId=profile.student_id_code,
@@ -51,11 +49,12 @@ async def create_profile(
             department=profile.department,
             enrollmentYear=profile.enrollment_year,
             expectedGraduationYear=profile.expected_graduation_year,
-            totalRequiredCreditHours=profile.total_required_credit_hours,
-            mandatoryCreditHours=profile.mandatory_credit_hours,
-            electiveCreditHours=profile.elective_credit_hours,
-            majorCreditHours=profile.major_credit_hours,
-            curriculumPdfName=profile.curriculum_pdf_name
+            totalRequiredCreditHours=plan.total_required_credit_hours if plan else 0,
+            mandatoryCreditHours=plan.mandatory_credit_hours if plan else 0,
+            electiveCreditHours=plan.elective_credit_hours if plan else 0,
+            majorCreditHours=plan.major_credit_hours if plan else 0,
+            curriculumPdfName=plan.curriculum_pdf_name if plan else None,
+            curriculumPdfPath=plan.curriculum_pdf_path if plan else None
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -76,13 +75,10 @@ async def get_profile(
             faculty="",
             department="",
             enrollmentYear=0,
-            expectedGraduationYear=0,
-            totalRequiredCreditHours=0,
-            mandatoryCreditHours=0,
-            electiveCreditHours=0,
-            majorCreditHours=0,
-            curriculumPdfName=None
+            expectedGraduationYear=0
         )
+
+    plan = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(profile.department)).first()
 
     return StudentProfileResponse(
         fullName=student.name,
@@ -92,11 +88,12 @@ async def get_profile(
         department=profile.department,
         enrollmentYear=profile.enrollment_year,
         expectedGraduationYear=profile.expected_graduation_year,
-        totalRequiredCreditHours=profile.total_required_credit_hours,
-        mandatoryCreditHours=profile.mandatory_credit_hours,
-        electiveCreditHours=profile.elective_credit_hours,
-        majorCreditHours=profile.major_credit_hours,
-        curriculumPdfName=profile.curriculum_pdf_name
+        totalRequiredCreditHours=plan.total_required_credit_hours if plan else 0,
+        mandatoryCreditHours=plan.mandatory_credit_hours if plan else 0,
+        electiveCreditHours=plan.elective_credit_hours if plan else 0,
+        majorCreditHours=plan.major_credit_hours if plan else 0,
+        curriculumPdfName=plan.curriculum_pdf_name if plan else None,
+        curriculumPdfPath=plan.curriculum_pdf_path if plan else None
     )
 
 

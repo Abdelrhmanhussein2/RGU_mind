@@ -9,6 +9,7 @@ export function UniversityResetPassword() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "";
+  const otp = location.state?.otp || "";
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,7 @@ export function UniversityResetPassword() {
     setIsLoading(true);
     try {
       // 🔌 BACKEND: replace mock with real resetPassword call
-      await resetPassword(email, formData.password, "university");
+      await resetPassword(email, otp, formData.password, "university");
       setIsSuccess(true);
       setTimeout(() => navigate("/university/signin"), 2000);
     } catch {

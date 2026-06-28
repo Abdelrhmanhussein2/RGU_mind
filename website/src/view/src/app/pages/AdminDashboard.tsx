@@ -35,7 +35,9 @@ import {
 } from "../lib/adminUniversities";
 import api from "../../services/api";
 
-type Tab = "pending" | "approved" | "rejected" | "universities" | "settings";
+import { AcademicPlansManager } from "../../components/admin/AcademicPlansManager";
+
+type Tab = "pending" | "approved" | "rejected" | "universities" | "academic_plans" | "settings";
 
 function RegulationCard({
   regulation,
@@ -73,7 +75,22 @@ function RegulationCard({
             )}
           </div>
         </div>
-        {children && <div className="flex items-center gap-2 flex-shrink-0">{children}</div>}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {regulation.fileUrl && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000";
+                const fileUrl = regulation.fileUrl!.replace(/\\/g, '/');
+                window.open(`${baseUrl}/${fileUrl}`, '_blank');
+              }}
+            >
+              View Document
+            </Button>
+          )}
+          {children}
+        </div>
       </CardContent>
     </Card>
   );
@@ -86,6 +103,7 @@ export function AdminDashboard() {
   const [regulations, setRegulations] = useState<RegulationSubmission[]>([]);
   const [universities, setUniversities] = useState<UniversitySubmission[]>([]);
   const [rejectTarget, setRejectTarget] = useState<RegulationSubmission | null>(null);
+  const [viewUniversity, setViewUniversity] = useState<UniversitySubmission | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [profile, setProfile] = useState({
     name: state.user?.name || "Platform Admin",
@@ -112,6 +130,43 @@ export function AdminDashboard() {
   const approved = regulations.filter((r) => r.status === "approved");
   const rejected = regulations.filter((r) => r.status === "rejected");
   const pendingUniversities = universities.filter((u) => u.status === "pending");
+  const approvedUniversities = universities.filter((u) => u.status === "approved");
+  const rejectedUniversities = universities.filter((u) => u.status === "rejected");
+
+  const renderUniversityCard = (u: UniversitySubmission, showActions = false) => (
+    <Card key={u.id}>
+      <CardContent className="pt-6 flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Building2 className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <p className="font-medium text-gray-900">{u.name}</p>
+            <p className="text-sm text-gray-500 mt-1">{u.contactEmail} · {u.country}</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Submitted {new Date(u.submittedDate).toLocaleDateString()}
+              {u.verificationFileUrl && <> · {u.verificationFileUrl}</>}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button size="sm" variant="outline" onClick={() => setViewUniversity(u)}>
+            View
+          </Button>
+          {showActions && (
+            <>
+              <Button size="sm" onClick={() => handleApproveUniversity(u.id)}>
+                Approve
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => handleRejectUniversity(u.id)}>
+                Reject
+              </Button>
+            </>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   const handleApprove = async (id: string) => {
     try {
@@ -184,46 +239,46 @@ export function AdminDashboard() {
     }
   };
 
-  const navItems: { id: Tab; label: string; icon: typeof Clock; count?: number }[] = [
-    { id: "pending", label: "Pending Review", icon: Clock, count: pending.length },
-    { id: "approved", label: "Approved", icon: CheckCircle2, count: approved.length },
-    { id: "rejected", label: "Rejected", icon: XCircle, count: rejected.length },
-    { id: "universities", label: "Pending Universities", icon: Building2, count: pendingUniversities.length },
-    { id: "settings", label: "Settings", icon: SettingsIcon },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-gray-900">Admin Console</span>
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-2 text-purple-600 mb-1">
+            <ShieldCheck className="w-6 h-6" />
+            <h1 className="text-xl font-bold">Admin Console</h1>
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
-          {navItems.map((item) => {
+        <nav className="flex-1 p-4 space-y-1">
+          {[
+            { id: "pending", label: "Pending Review", icon: Clock, count: pending.length },
+            { id: "approved", label: "Approved", icon: CheckCircle2, count: approved.length + approvedUniversities.length },
+            { id: "rejected", label: "Rejected", icon: XCircle, count: rejected.length + rejectedUniversities.length },
+            { id: "universities", label: "Pending Universities", icon: Building2, count: pendingUniversities.length },
+            { id: "academic_plans", label: "Academic Plans", icon: FileText as any, count: 0 },
+            { id: "settings", label: "Settings", icon: SettingsIcon },
+          ].map((item) => {
             const Icon = item.icon;
+            const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
-                  activeTab === item.id
-                    ? "bg-purple-50 text-purple-700"
-                    : "text-gray-700 hover:bg-gray-100"
+                onClick={() => setActiveTab(item.id as Tab)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
+                  isActive ? "bg-purple-50 text-purple-700" : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                <span className="flex items-center gap-3">
-                  <Icon className="w-5 h-5" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </span>
-                {typeof item.count === "number" && item.count > 0 && (
-                  <span className="text-xs font-semibold bg-purple-100 text-purple-700 rounded-full px-2 py-0.5">
+                <div className="flex items-center gap-3">
+                  <Icon className={`w-5 h-5 ${isActive ? "text-purple-600" : "text-gray-400"}`} />
+                  <span className="font-medium text-sm">{item.label}</span>
+                </div>
+                {item.count !== undefined && item.count > 0 && (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      isActive ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
                     {item.count}
                   </span>
                 )}
@@ -232,7 +287,7 @@ export function AdminDashboard() {
           })}
         </nav>
 
-        <div className="border-t border-gray-200 p-3 space-y-1">
+        <div className="border-t border-gray-200 p-4 space-y-1">
           <button
             onClick={() => navigate("/")}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
@@ -273,24 +328,54 @@ export function AdminDashboard() {
         )}
 
         {activeTab === "approved" && (
-          <div className="space-y-4 max-w-3xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Approved</h2>
-            {approved.length === 0 ? (
-              <p className="text-gray-500">No approved regulations yet.</p>
-            ) : (
-              approved.map((r) => <RegulationCard key={r.id} regulation={r} />)
-            )}
+          <div className="space-y-8 max-w-3xl">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Approved Regulations</h2>
+              <div className="space-y-4">
+                {approved.length === 0 ? (
+                  <p className="text-gray-500">No approved regulations yet.</p>
+                ) : (
+                  approved.map((r) => <RegulationCard key={r.id} regulation={r} />)
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Approved Universities</h2>
+              <div className="space-y-4">
+                {approvedUniversities.length === 0 ? (
+                  <p className="text-gray-500">No approved universities yet.</p>
+                ) : (
+                  approvedUniversities.map((u) => renderUniversityCard(u, false))
+                )}
+              </div>
+            </div>
           </div>
         )}
 
         {activeTab === "rejected" && (
-          <div className="space-y-4 max-w-3xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Rejected</h2>
-            {rejected.length === 0 ? (
-              <p className="text-gray-500">No rejected regulations.</p>
-            ) : (
-              rejected.map((r) => <RegulationCard key={r.id} regulation={r} />)
-            )}
+          <div className="space-y-8 max-w-3xl">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Rejected Regulations</h2>
+              <div className="space-y-4">
+                {rejected.length === 0 ? (
+                  <p className="text-gray-500">No rejected regulations.</p>
+                ) : (
+                  rejected.map((r) => <RegulationCard key={r.id} regulation={r} />)
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Rejected Universities</h2>
+              <div className="space-y-4">
+                {rejectedUniversities.length === 0 ? (
+                  <p className="text-gray-500">No rejected universities.</p>
+                ) : (
+                  rejectedUniversities.map((u) => renderUniversityCard(u, false))
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -317,6 +402,9 @@ export function AdminDashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button size="sm" variant="outline" onClick={() => setViewUniversity(u)}>
+                        View
+                      </Button>
                       <Button size="sm" onClick={() => handleApproveUniversity(u.id)}>
                         Approve
                       </Button>
@@ -371,7 +459,63 @@ export function AdminDashboard() {
             </Card>
           </div>
         )}
+
+        {activeTab === "academic_plans" && (
+          <AcademicPlansManager />
+        )}
       </main>
+
+      <Dialog open={!!viewUniversity} onOpenChange={(v) => !v && setViewUniversity(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>University Details</DialogTitle>
+          </DialogHeader>
+          {viewUniversity && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Name</p>
+                <p className="text-base text-gray-900">{viewUniversity.name}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Email</p>
+                <p className="text-base text-gray-900">{viewUniversity.contactEmail}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Country</p>
+                <p className="text-base text-gray-900">{viewUniversity.country}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Submitted Date</p>
+                <p className="text-base text-gray-900">
+                  {new Date(viewUniversity.submittedDate).toLocaleDateString()}
+                </p>
+              </div>
+              {viewUniversity.verificationFileUrl && (
+                <div className="pt-2 border-t">
+                  <p className="text-sm font-medium text-gray-500 mb-2">Verification File</p>
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center"
+                    onClick={() => {
+                      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000";
+                      const fileUrl = viewUniversity.verificationFileUrl.replace(/\\/g, '/');
+                      window.open(`${baseUrl}/${fileUrl}`, '_blank');
+                    }}
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    View Uploaded File
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewUniversity(null)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!rejectTarget} onOpenChange={(v) => !v && setRejectTarget(null)}>
         <DialogContent>

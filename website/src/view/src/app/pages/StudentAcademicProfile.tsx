@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
+import api from "../../services/api";
 import {
   ArrowLeft,
   GraduationCap,
@@ -104,18 +105,30 @@ function readFileAsBase64(file: File): Promise<string> {
 }
 
 function modeButtonClass(active: boolean): string {
-  return `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-    active ? "bg-indigo-600 text-white" : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-  }`;
+  return `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${active ? "bg-indigo-600 text-white" : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+    }`;
 }
 
 function pillButtonClass(active: boolean): string {
-  return `px-3 py-1.5 rounded-lg text-sm font-medium ${
-    active ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600"
-  }`;
+  return `px-3 py-1.5 rounded-lg text-sm font-medium ${active ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600"
+    }`;
 }
 
 /* ───────────────────────── Shared course editing ───────────────────────── */
+
+function getGradeFromPoints(pts: number): GradeLetter {
+  if (pts >= 4.0) return "A+";
+  if (pts >= 3.7) return "A-";
+  if (pts >= 3.3) return "B+";
+  if (pts >= 3.0) return "B";
+  if (pts >= 2.7) return "B-";
+  if (pts >= 2.3) return "C+";
+  if (pts >= 2.0) return "C";
+  if (pts >= 1.7) return "C-";
+  if (pts >= 1.3) return "D+";
+  if (pts >= 1.0) return "D";
+  return "F";
+}
 
 function CourseRow({
   course,
@@ -126,6 +139,16 @@ function CourseRow({
   onUpdate: (patch: Partial<Course>) => void;
   onRemove: () => void;
 }) {
+  const [pointInput, setPointInput] = useState<string>("");
+
+  const handlePointChange = (val: string) => {
+    setPointInput(val);
+    const pts = parseFloat(val);
+    if (!isNaN(pts)) {
+      onUpdate({ grade: getGradeFromPoints(pts) });
+    }
+  };
+
   return (
     <div className="flex gap-2 items-center">
       <input
@@ -139,10 +162,22 @@ function CourseRow({
         min={1}
         value={course.creditHours}
         onChange={(e) => onUpdate({ creditHours: Number(e.target.value) || 0 })}
-        className="w-20 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-16 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        title="Credit Hours"
+      />
+      <input
+        type="number"
+        min={0}
+        max={4}
+        step={0.1}
+        value={pointInput}
+        onChange={(e) => handlePointChange(e.target.value)}
+        placeholder="Pts"
+        className="w-16 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        title="Points (e.g., 3.5)"
       />
       <Select value={course.grade} onValueChange={(v) => onUpdate({ grade: v as GradeLetter })}>
-        <SelectTrigger className="w-24">
+        <SelectTrigger className="w-20">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -407,95 +442,7 @@ function GpaCalculatorTab({ terms }: { terms: TermGrades[] }) {
 
 /* ───────────────────────── Grades History tab ───────────────────────── */
 
-function AddResultImageDialog({
-  open,
-  onOpenChange,
-  onSave,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSave: (image: { termName: string; imageBase64: string }) => void;
-}) {
-  const [termName, setTermName] = useState("");
-  const [imageBase64, setImageBase64] = useState<string | undefined>(undefined);
-  const [error, setError] = useState("");
 
-  const reset = () => {
-    setTermName("");
-    setImageBase64(undefined);
-    setError("");
-  };
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageBase64(await readFileAsBase64(file));
-  };
-
-  const handleSubmit = () => {
-    if (!termName.trim()) {
-      setError("Term name is required");
-      return;
-    }
-    if (!imageBase64) {
-      setError("Please upload a result image");
-      return;
-    }
-    onSave({ termName: termName.trim(), imageBase64 });
-    reset();
-    onOpenChange(false);
-  };
-
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(v) => {
-        if (!v) reset();
-        onOpenChange(v);
-      }}
-    >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Result Image</DialogTitle>
-          <DialogDescription>Upload your official faculty result photo for this term.</DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Term Name</label>
-            <input
-              value={termName}
-              onChange={(e) => setTermName(e.target.value)}
-              placeholder="Fall 2025"
-              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Result Image</label>
-            <input type="file" accept="image/*" onChange={handleImageChange} className="block w-full text-sm text-gray-600" />
-            {imageBase64 && (
-              <img src={imageBase64} alt="Preview" className="mt-2 h-28 rounded-lg border border-gray-200 object-cover" />
-            )}
-          </div>
-        </div>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              reset();
-              onOpenChange(false);
-            }}
-          >
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit}>Save</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 function AddTermDialog({
   open,
@@ -586,70 +533,21 @@ function AddTermDialog({
 }
 
 function GradesHistoryTab({
-  images,
-  onAddImage,
-  onDeleteImage,
   terms,
   onAddTerm,
   onDeleteTerm,
   onDeleteCourse,
 }: {
-  images: ResultImage[];
-  onAddImage: (img: { termName: string; imageBase64: string }) => Promise<void>;
-  onDeleteImage: (id: string) => Promise<void>;
   terms: TermGrades[];
   onAddTerm: (term: { termName: string; courses: Course[] }) => Promise<void>;
   onDeleteTerm: (id: string) => Promise<void>;
   onDeleteCourse: (termId: string, courseId: string) => Promise<void>;
 }) {
-  const [viewImage, setViewImage] = useState<string | null>(null);
-  const [showAddImage, setShowAddImage] = useState(false);
   const [showAddTerm, setShowAddTerm] = useState(false);
 
   return (
     <div className="space-y-10">
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Result Images</h3>
-          <Button onClick={() => setShowAddImage(true)}>
-            <Plus className="w-4 h-4" /> Add Result Image
-          </Button>
-        </div>
 
-        {images.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <ImageIcon className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-            No result images yet.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {images.map((img) => (
-              <Card key={img.id} className="overflow-hidden">
-                <button
-                   type="button"
-                   onClick={() => setViewImage(img.imageUrl ?? img.imageBase64 ?? null)}
-                   className="block w-full h-36 bg-gray-100"
-                >
-                  <img src={img.imageUrl ?? img.imageBase64} alt={img.termName} className="w-full h-full object-cover" />
-                </button>
-                <CardContent className="pt-4 flex items-start justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">{img.termName}</p>
-                    <p className="text-xs text-gray-500">{new Date(img.uploadDate).toLocaleDateString()}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onDeleteImage(img.id)}
-                    className="text-gray-400 hover:text-red-600"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </section>
 
       <section>
         <div className="flex items-center justify-between mb-4">
@@ -701,7 +599,7 @@ function GradesHistoryTab({
                     ) : (
                       <Table>
                         <TableHeader>
-                           <TableRow>
+                          <TableRow>
                             <TableHead>Course Name</TableHead>
                             <TableHead>Credit Hours</TableHead>
                             <TableHead>Grade</TableHead>
@@ -738,25 +636,11 @@ function GradesHistoryTab({
         )}
       </section>
 
-      <AddResultImageDialog
-        open={showAddImage}
-        onOpenChange={setShowAddImage}
-        onSave={onAddImage}
-      />
       <AddTermDialog
         open={showAddTerm}
         onOpenChange={setShowAddTerm}
         onSave={onAddTerm}
       />
-
-      <Dialog open={!!viewImage} onOpenChange={() => setViewImage(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Result Image</DialogTitle>
-          </DialogHeader>
-          {viewImage && <img src={viewImage} alt="Full result" className="w-full rounded-lg" />}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -968,15 +852,17 @@ function MyInfoTab({
 }) {
   const [form, setForm] = useState<Partial<StudentProfile> | Record<string, any>>(profile);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [academicPlan, setAcademicPlan] = useState<any>(null);
 
   useEffect(() => setForm(profile), [profile]);
 
-  const handleCurriculumChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const base64 = await readFileAsBase64(file);
-    setForm({ ...form, curriculumPdfName: file.name, curriculumPdfBase64: base64 });
-  };
+  useEffect(() => {
+    if (profile.department) {
+      api.get(`/academic-plans/by-program/${encodeURIComponent(profile.department)}`)
+        .then((res) => setAcademicPlan(res.data))
+        .catch((err) => console.error("Failed to load academic plan", err));
+    }
+  }, [profile.department]);
 
   const field = (label: string, key: keyof StudentProfile, type: "text" | "number" = "text") => (
     <div>
@@ -996,57 +882,84 @@ function MyInfoTab({
   );
 
   return (
-    <Card>
-      <CardContent className="pt-6 space-y-6 max-w-2xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {field("Full Name", "fullName")}
-          {field("Student ID", "studentId")}
-          {field("University", "university")}
-          {field("Faculty", "faculty")}
-          {field("Department", "department")}
-          {field("Enrollment Year", "enrollmentYear", "number")}
-          {field("Expected Graduation Year", "expectedGraduationYear", "number")}
-        </div>
-
-        <div>
-          <h4 className="text-sm font-semibold text-gray-900 mb-3">Academic Plan</h4>
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-6 space-y-6 max-w-2xl">
+          <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {field("Total Required Credit Hours", "totalRequiredCreditHours", "number")}
-            {field("Mandatory Credit Hours", "mandatoryCreditHours", "number")}
-            {field("Elective Credit Hours", "electiveCreditHours", "number")}
-            {field("Major Credit Hours", "majorCreditHours", "number")}
+            {field("Full Name", "fullName")}
+            {field("Student ID", "studentId")}
+            {field("University", "university")}
+            {field("Faculty", "faculty")}
+            {field("Department", "department")}
+            {field("Enrollment Year", "enrollmentYear", "number")}
+            {field("Expected Graduation Year", "expectedGraduationYear", "number")}
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Curriculum PDF</label>
-          {form.curriculumPdfName && (
-            <p className="text-sm text-gray-600 mb-2 flex items-center gap-1.5">
-              <FileText className="w-4 h-4 text-gray-400" /> {form.curriculumPdfName}
-            </p>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={async () => {
+                await onSave(form as Partial<StudentProfile>);
+                setShowSuccess(true);
+                setTimeout(() => setShowSuccess(false), 3000);
+              }}
+            >
+              Save Changes
+            </Button>
+            {showSuccess && <span className="text-sm text-green-600 font-medium">Profile updated successfully!</span>}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6 max-w-2xl">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Academic Plan Summary</h3>
+          {academicPlan ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-500 mb-1">Program Name</p>
+                  <p className="font-semibold text-gray-900">{academicPlan.programName}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-500 mb-1">Total Credit Hours</p>
+                  <p className="font-semibold text-gray-900">{academicPlan.totalRequiredCreditHours}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-500 mb-1">Mandatory Hours</p>
+                  <p className="font-semibold text-gray-900">{academicPlan.mandatoryCreditHours}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-500 mb-1">Elective Hours</p>
+                  <p className="font-semibold text-gray-900">{academicPlan.electiveCreditHours}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-gray-500 mb-1">Major Hours</p>
+                  <p className="font-semibold text-gray-900">{academicPlan.majorCreditHours}</p>
+                </div>
+              </div>
+
+              {academicPlan.curriculumPdfName && (
+                <div className="mt-4 flex items-center justify-between p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+                  <div className="flex items-center gap-2 text-indigo-700">
+                    <FileText className="w-5 h-5" />
+                    <span className="font-medium text-sm">{academicPlan.curriculumPdfName}</span>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => window.open(api.defaults.baseURL + "/" + academicPlan.curriculumPdfPath, '_blank')} className="bg-white hover:bg-gray-50 text-indigo-600 border-indigo-200">
+                    View PDF
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-gray-500 text-sm">No academic plan assigned to your program yet.</p>
+              <p className="text-gray-400 text-xs mt-1">Please wait for your faculty administration to upload it.</p>
+            </div>
           )}
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handleCurriculumChange}
-            className="block w-full text-sm text-gray-600"
-          />
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button
-            onClick={async () => {
-              await onSave(form as Partial<StudentProfile>);
-              setShowSuccess(true);
-              setTimeout(() => setShowSuccess(false), 3000);
-            }}
-          >
-            Save Changes
-          </Button>
-          {showSuccess && <span className="text-sm text-green-600 font-medium">Profile updated successfully!</span>}
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -1213,7 +1126,6 @@ export function StudentAcademicProfile() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<StudentProfile>(EMPTY_STUDENT_PROFILE);
   const [terms, setTerms] = useState<TermGrades[]>([]);
-  const [images, setImages] = useState<ResultImage[]>([]);
   const [showEligibilityModal, setShowEligibilityModal] = useState(false);
 
   useEffect(() => {
@@ -1223,8 +1135,6 @@ export function StudentAcademicProfile() {
         setProfile(p);
         const t = await getTermGrades();
         setTerms(t);
-        const img = await getResultImages();
-        setImages(img);
       } catch (err) {
         console.error("Failed to load academic profile:", err);
       }
@@ -1243,23 +1153,7 @@ export function StudentAcademicProfile() {
     }
   };
 
-  const handleAddResultImage = async (img: { termName: string; imageBase64: string }) => {
-    try {
-      const newImg = await addResultImage(img);
-      setImages((prev) => [newImg, ...prev]);
-    } catch (err) {
-      console.error("Failed to add result image:", err);
-    }
-  };
 
-  const handleDeleteResultImage = async (id: string) => {
-    try {
-      await deleteResultImage(id);
-      setImages((prev) => prev.filter((img) => img.id !== id));
-    } catch (err) {
-      console.error("Failed to delete result image:", err);
-    }
-  };
 
   const handleAddTerm = async (term: { termName: string; courses: Course[] }) => {
     try {
@@ -1314,8 +1208,7 @@ export function StudentAcademicProfile() {
         <Tabs defaultValue={new URLSearchParams(window.location.search).get("tab") || "overview"}>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="grades">Grades History</TabsTrigger>
-            <TabsTrigger value="gpa">GPA Calculator</TabsTrigger>
+            <TabsTrigger value="grades">Grades History & GPA</TabsTrigger>
             <TabsTrigger value="info">My Info</TabsTrigger>
             <TabsTrigger value="curriculum">Curriculum Map</TabsTrigger>
           </TabsList>
@@ -1324,20 +1217,21 @@ export function StudentAcademicProfile() {
             <OverviewTab profile={profile} terms={terms} onCheckEligibility={() => setShowEligibilityModal(true)} />
           </TabsContent>
 
-          <TabsContent value="grades" className="mt-6">
+          <TabsContent value="grades" className="mt-6 space-y-12">
             <GradesHistoryTab
-              images={images}
-              onAddImage={handleAddResultImage}
-              onDeleteImage={handleDeleteResultImage}
               terms={terms}
               onAddTerm={handleAddTerm}
               onDeleteTerm={handleDeleteTerm}
               onDeleteCourse={handleDeleteCourse}
             />
-          </TabsContent>
 
-          <TabsContent value="gpa" className="mt-6">
-            <GpaCalculatorTab terms={terms} />
+            <section>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">GPA Calculator</h3>
+                <p className="text-sm text-gray-500">Calculate cumulative, manual, or hypothetical GPAs.</p>
+              </div>
+              <GpaCalculatorTab terms={terms} />
+            </section>
           </TabsContent>
 
           <TabsContent value="info" className="mt-6">

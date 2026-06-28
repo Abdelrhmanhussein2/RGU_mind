@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { AuthLayout } from "../../components/auth/AuthLayout";
+import { useAuth } from "../../../store/authStore";
 
 import api from "../../../services/api";
 
 export function AdminSignIn() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -18,11 +20,15 @@ export function AdminSignIn() {
     setIsLoading(true);
     try {
       // 🔌 BACKEND: POST /admin/auth/login  { email, password }
-      await api.post("/admin/auth/login", {
+      const response = await api.post("/admin/auth/login", {
         email: formData.email,
         password: formData.password,
       });
-      navigate("/admin/verify-otp", { state: { email: formData.email } });
+      
+      const { user, token } = response.data;
+      login(user, token);
+      
+      navigate("/admin");
     } catch {
       setError("Invalid email or password. Please try again.");
     } finally {

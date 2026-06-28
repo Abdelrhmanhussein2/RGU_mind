@@ -57,35 +57,44 @@ class EmbeddingService:
 
         texts = [c.content for c in chunks]
 
-        response = self.co.embed(
-            texts=texts,
-            model="embed-multilingual-v3.0",
-            input_type="search_document"
-        )
-        embeddings = response.embeddings
-
         self._ensure_collection_exists()
 
-        points = [
-            PointStruct(
-                id=str(c.id),
-                vector=embeddings[i],
-                payload={
-                    "document_id": str(document_id),
-                    "department_id": str(department_id),
-                    "chunk_id": str(c.id),
-                    "content": c.content,
-                    "page_ref": c.page_ref
-                }
-            )
-            for i, c in enumerate(chunks)
-        ]
+        batch_size = 90
+        total_points_inserted = 0
 
-        self.qdrant.upsert(
-            collection_name=self.collection_name,
-            points=points
-        )
-        return {"message": f"Embedded {len(points)} chunks successfully"}
+        for i in range(0, len(chunks), batch_size):
+            batch_chunks = chunks[i:i + batch_size]
+            texts = [c.content for c in batch_chunks]
+
+            response = self.co.embed(
+                texts=texts,
+                model="embed-multilingual-v3.0",
+                input_type="search_document"
+            )
+            embeddings = response.embeddings
+
+            points = [
+                PointStruct(
+                    id=str(c.id),
+                    vector=embeddings[j],
+                    payload={
+                        "document_id": str(document_id),
+                        "department_id": str(department_id),
+                        "chunk_id": str(c.id),
+                        "content": c.content,
+                        "page_ref": c.page_ref
+                    }
+                )
+                for j, c in enumerate(batch_chunks)
+            ]
+
+            self.qdrant.upsert(
+                collection_name=self.collection_name,
+                points=points
+            )
+            total_points_inserted += len(points)
+
+        return {"message": f"Embedded {total_points_inserted} chunks successfully"}
 
     def delete_embedding_documents(self, document_ids: list[UUID]):
         if not document_ids:

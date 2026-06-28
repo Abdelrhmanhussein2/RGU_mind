@@ -33,13 +33,7 @@ class StudentProfileService:
                 faculty=profile_req.faculty,
                 department=profile_req.department,
                 enrollment_year=profile_req.enrollmentYear,
-                expected_graduation_year=profile_req.expectedGraduationYear,
-                total_required_credit_hours=profile_req.totalRequiredCreditHours,
-                mandatory_credit_hours=profile_req.mandatoryCreditHours,
-                elective_credit_hours=profile_req.electiveCreditHours,
-                major_credit_hours=profile_req.majorCreditHours,
-                curriculum_pdf_name=profile_req.curriculumPdfName,
-                curriculum_pdf_path=curriculum_pdf_path
+                expected_graduation_year=profile_req.expectedGraduationYear
             )
             db.add(profile)
         else:
@@ -49,14 +43,6 @@ class StudentProfileService:
             profile.department = profile_req.department
             profile.enrollment_year = profile_req.enrollmentYear
             profile.expected_graduation_year = profile_req.expectedGraduationYear
-            profile.total_required_credit_hours = profile_req.totalRequiredCreditHours
-            profile.mandatory_credit_hours = profile_req.mandatoryCreditHours
-            profile.elective_credit_hours = profile_req.electiveCreditHours
-            profile.major_credit_hours = profile_req.majorCreditHours
-            if profile_req.curriculumPdfName:
-                profile.curriculum_pdf_name = profile_req.curriculumPdfName
-            if curriculum_pdf_path:
-                profile.curriculum_pdf_path = curriculum_pdf_path
 
         db.commit()
         db.refresh(profile)

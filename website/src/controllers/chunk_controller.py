@@ -37,6 +37,15 @@ class ChunkController:
             
             # Embed and store chunks
             await embedding_service.embed_and_store(document_id, db)
+            
+            # Update Regulation status to active
+            from models.regulation_model import Regulation
+            from helpers.enums import RegulationStatus
+            regulation = db.query(Regulation).filter(Regulation.id == document.regulation_id).first()
+            if regulation:
+                regulation.status = RegulationStatus.active
+                db.commit()
+
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
                 content={

@@ -9,24 +9,25 @@ class LLMService:
 
     def generate_answer(self, query: str, context_chunks: list[str]):
         context = "\n\n".join(context_chunks)
-        prompt = f"""You are a helpful assistant for university students. 
-Please answer the following question in Arabic based on the provided documents.
-If the answer is not contained within the documents, say "عذراً، لا أملك معلومات كافية للإجابة على هذا السؤال بناءً على المستندات المتاحة."
+        system_prompt = """You are a highly strict academic assistant for RGU university. 
+Your ONLY task is to answer student questions based strictly on the provided documents.
 
-Documents:
-{context}
+CRITICAL RULES:
+1. You are FORBIDDEN from answering using outside knowledge. You must ONLY use the provided documents.
+2. If the answer is NOT explicitly stated in the documents, you MUST output EXACTLY this phrase and nothing else: "عذراً، هذه المعلومة غير متوفرة في اللائحة المتاحة". Do NOT guess, deduce, or hallucinate answers.
+3. If the answer is found, cite the article number (مادة) if available, AND you MUST explicitly mention the Chunk ID ([رقم الشانك: ...]) that you used to get the answer.
+4. OCR Error Warning: The provided text is extracted from a PDF and contains Arabic numeral extraction errors. Specifically, the number '0' is often extracted as '1'. For example, '100' might appear as '111'. If you see '111' next to the word '(مائة)' (which means one hundred), you must correct it to '100' in your final answer. Apply logic to fix obvious numerical typos.
+5. Your final response MUST be entirely in Arabic, concise, and accurate."""
 
-Question: {query}
-Answer:"""
+        user_prompt = f"المستندات:\n{context}\n\nالسؤال: {query}\nالإجابة:"
 
         response = self.groq.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {
-                "role": "user",
-                "content": prompt,
-                }
-            ]
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.0
         )
         return response.choices[0].message.content
 

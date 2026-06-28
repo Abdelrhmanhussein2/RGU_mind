@@ -105,7 +105,6 @@ export function StudentChat() {
     setIsLoading(true);
 
     try {
-      // 🔌 BACKEND: replace mock with real sendMessage call
       const { answer, sources } = await sendMessage(userMessage.content);
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -114,11 +113,12 @@ export function StudentChat() {
         sources,
       };
       setMessages((prev) => [...prev, aiMessage]);
-    } catch {
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.detail || "Sorry, something went wrong. Please try again.";
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "Sorry, something went wrong. Please try again.",
+        content: errorMsg,
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {

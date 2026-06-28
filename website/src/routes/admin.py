@@ -36,19 +36,44 @@ async def create_admin(
 @admin_router.post("/approve-university/{university_id}")
 async def approve_university(
     university_id: str, 
-    x_admin_id: str = Header(..., description="The ID of the admin"), 
+    x_admin_id: str = Header(None, description="The ID of the admin"), 
+    admin: Admin = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
-    return admin_controller.change_university_status_controller(university_id, "approved", x_admin_id, db)
+    admin_id = x_admin_id or str(admin.id)
+    return admin_controller.change_university_status_controller(university_id, "approved", admin_id, db)
 
 
 @admin_router.post("/reject-university/{university_id}")
 async def reject_university(
     university_id: str, 
-    x_admin_id: str = Header(..., description="The ID of the admin"), 
+    x_admin_id: str = Header(None, description="The ID of the admin"), 
+    admin: Admin = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
-    return admin_controller.change_university_status_controller(university_id, "rejected", x_admin_id, db)
+    admin_id = x_admin_id or str(admin.id)
+    return admin_controller.change_university_status_controller(university_id, "rejected", admin_id, db)
+
+
+@admin_router.get("/universities")
+async def get_universities(
+    admin: Admin = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    universities = db.query(University).all()
+    return [
+        {
+            "id": str(u.id),
+            "name": u.name,
+            "contactEmail": u.contact_email,
+            "country": u.country,
+            "submittedDate": u.created_at.isoformat() if u.created_at else datetime.utcnow().isoformat(),
+            "verificationFileUrl": u.verification_file_url,
+            "status": u.status
+        }
+        for u in universities
+    ]
+
 
 
 # --- New Admin Auth Endpoints ---
@@ -59,8 +84,17 @@ async def admin_login(request: AdminLoginRequest, db: Session = Depends(get_db))
     if not admin or not verify_password(request.password, admin.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     
-    # In a real system we would trigger an OTP to email. Since this is mock OTP, we just return success.
-    return {"message": "OTP verification code sent"}
+    token = create_access_token(data={"sub": str(admin.id), "role": "admin"})
+    
+    return {
+        "token": token,
+        "user": {
+            "id": str(admin.id),
+            "name": admin.name,
+            "email": admin.email,
+            "role": "admin"
+        }
+    }
 
 
 @admin_router.post("/auth/verify-otp")
@@ -121,6 +155,7 @@ async def get_pending_regulations(
         Document.filename.label("document_name"),
         Document.uploaded_at.label("upload_date"),
         Document.filename.label("file_type"),
+        Document.file_path.label("file_path"),
         Regulation.status,
         Regulation.rejection_reason,
         Regulation.reviewed_at
@@ -157,6 +192,7 @@ async def get_pending_regulations(
             "documentName": r.document_name or "curriculum.pdf",
             "uploadDate": r.upload_date.isoformat() if r.upload_date else datetime.utcnow().isoformat(),
             "fileType": ext or "pdf",
+            "fileUrl": r.file_path,
             "status": status_str,
             "rejectionReason": r.rejection_reason,
             "reviewedDate": r.reviewed_at.isoformat() if r.reviewed_at else None

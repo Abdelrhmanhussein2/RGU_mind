@@ -7,59 +7,58 @@ export interface UploadedDocument {
   uploadedAt: string;
 }
 
-// 🔌 BACKEND: POST /data/upload  (multipart/form-data)  → { regulation_id, file_name, message }
-// ⚠️ SHAPE MISMATCH: backend expects one file at a time plus query params: department_id (UUID), title, version
-//    Frontend sends an array of files with no department_id/title/version — these params must be collected from UI
-// ⚠️ RESPONSE MISMATCH: backend returns { regulation_id, file_name, message }, not UploadedDocument[]
+// 🔌 BACKEND: POST /university/upload-regulation
 export async function uploadDocuments(
-  files: File[]
+  files: File[],
+  facultyName: string,
+  departmentName: string
 ): Promise<UploadedDocument[]> {
-  void api;
-  // Real call (single file, requires department_id + title + version from the UI):
-  //   const form = new FormData();
-  //   form.append("file", file);
-  //   return (await api.post(`/data/upload?department_id=${deptId}&title=${title}&version=${version}`, form, {
-  //     headers: { "Content-Type": "multipart/form-data" },
-  //   })).data;
-  return new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve(
-          files.map((f, i) => ({
-            id: (Date.now() + i).toString(),
-            name: f.name,
-            status: "processing",
-            uploadedAt: "Just now",
-          }))
-        ),
-      1000
-    )
-  );
+  const uploadedDocs: UploadedDocument[] = [];
+  
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("faculty_name", facultyName);
+    formData.append("department_name", departmentName);
+    formData.append("title", file.name.split('.')[0]); // Use filename as title without extension
+    formData.append("version", "1.0");
+    formData.append("file", file);
+
+    try {
+      const token = localStorage.getItem("token");
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000"; // Note: Use backend port
+      
+      const response = await fetch(`${baseUrl}/university/upload-regulation`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Upload failed with status ${response.status}`);
+      }
+      
+      const responseData = await response.json();
+      
+      uploadedDocs.push({
+        id: responseData.document_id || Date.now().toString(),
+        name: file.name,
+        status: "processing",
+        uploadedAt: "Just now",
+      });
+    } catch (error) {
+      console.error("Error uploading file:", file.name, error);
+    }
+  }
+  
+  return uploadedDocs;
 }
 
-// 🔌 BACKEND: GET /documents  → UploadedDocument[]  ⚠️ NOT YET IMPLEMENTED in backend
+// 🔌 BACKEND: GET /university/regulations
 export async function getDocuments(): Promise<UploadedDocument[]> {
-  void api; // will be: return (await api.get("/documents")).data
-  return new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve([
-          {
-            id: "1",
-            name: "Academic Regulations 2024.pdf",
-            status: "completed",
-            uploadedAt: "2 hours ago",
-          },
-          {
-            id: "2",
-            name: "Grading Policy.docx",
-            status: "processing",
-            uploadedAt: "10 minutes ago",
-          },
-        ]),
-      300
-    )
-  );
+  const response = await api.get("/university/regulations");
+  return response.data;
 }
 
 // 🔌 BACKEND: DELETE /documents/:id  ⚠️ NOT YET IMPLEMENTED in backend

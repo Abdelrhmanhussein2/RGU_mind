@@ -47,29 +47,37 @@ export async function registerStudent(
   university: string,
   email: string,
   password: string
-): Promise<AuthResponse> {
+): Promise<AuthResponse & { dev_otp?: string }> {
   const response = await api.post("/auth/register", {
     username: name,
     email: email,
     password: password,
     university_name: university,
   });
+  console.log("Registration Response:", response.data);
   return {
     token: response.data.token,
     user: response.data.user,
+    dev_otp: response.data.dev_otp,
   };
 }
+
 
 // 🔌 BACKEND: POST /auth/verify-register-otp { email, role, otp } — backend response is { message },
 // not { token, user }; the registration token/user come from registerStudent() and are carried
 // forward through navigation state to be used by login() once this verification succeeds.
-export async function verifyRegisterOtp(email: string, otp: string): Promise<void> {
-  await api.post("/auth/verify-register-otp", { email, role: "student", otp });
+// 🔌 BACKEND: POST /auth/verify-register-otp { email, role, otp }
+export async function verifyRegisterOtp(email: string, otp: string, role: Role): Promise<AuthResponse> {
+  const response = await api.post("/auth/verify-register-otp", { email, role, otp });
+  return {
+    token: response.data.token,
+    user: response.data.user
+  };
 }
 
 // 🔌 BACKEND: POST /auth/resend-register-otp { email, role }
-export async function resendRegisterOtp(email: string): Promise<void> {
-  await api.post("/auth/resend-register-otp", { email, role: "student" });
+export async function resendRegisterOtp(email: string, role: Role): Promise<void> {
+  await api.post("/auth/resend-register-otp", { email, role });
 }
 
 export async function registerUniversity(
@@ -100,8 +108,7 @@ export async function registerUniversity(
 }
 
 export async function forgotPassword(email: string, role: Role): Promise<void> {
-  // Not yet implemented on backend, fallback to success mock
-  return new Promise((resolve) => setTimeout(resolve, 500));
+  await api.post("/auth/forgot-password", { email, role });
 }
 
 export async function verifyOtp(
@@ -109,17 +116,16 @@ export async function verifyOtp(
   otp: string,
   role: Role
 ): Promise<void> {
-  // Not yet implemented on backend, fallback to success mock
-  return new Promise((resolve) => setTimeout(resolve, 500));
+  await api.post("/auth/verify-otp", { email, otp, role });
 }
 
 export async function resetPassword(
   email: string,
+  otp: string,
   newPassword: string,
   role: Role
 ): Promise<void> {
-  // Not yet implemented on backend, fallback to success mock
-  return new Promise((resolve) => setTimeout(resolve, 500));
+  await api.post("/auth/reset-password", { email, otp, new_password: newPassword, role });
 }
 
 export function logout(): void {

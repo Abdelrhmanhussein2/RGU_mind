@@ -23,12 +23,15 @@ export function StudentSignIn() {
     setError("");
     setIsLoading(true);
     try {
-      // 🔌 BACKEND: replace mock with real loginStudent call
       const { user, token } = await loginStudent(formData.email, formData.password);
       login(user, token);
       navigate("/student/chat");
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

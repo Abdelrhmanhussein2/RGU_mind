@@ -19,6 +19,8 @@ import { StudentResetPassword } from "./pages/auth/StudentResetPassword";
 import { UniversitySignIn } from "./pages/auth/UniversitySignIn";
 import { UniversityRegister } from "./pages/auth/UniversityRegister";
 import { UniversityForgotPassword } from "./pages/auth/UniversityForgotPassword";
+import { UniversityRegisterOtp } from "./pages/auth/UniversityRegisterOtp";
+import { UniversityPendingApproval } from "./pages/auth/UniversityPendingApproval";
 import { UniversityOtpVerification } from "./pages/auth/UniversityOtpVerification";
 import { UniversityResetPassword } from "./pages/auth/UniversityResetPassword";
 
@@ -113,6 +115,14 @@ export const router = createBrowserRouter([
   {
     path: "/university/register",
     Component: UniversityRegister,
+  },
+  {
+    path: "/university/verify-register-otp",
+    Component: UniversityRegisterOtp,
+  },
+  {
+    path: "/university/pending-approval",
+    Component: UniversityPendingApproval,
   },
   {
     path: "/university/forgot-password",

@@ -20,11 +20,37 @@ export function UniversityDashboard() {
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [facultyName, setFacultyName] = useState("");
+  const [departmentName, setDepartmentName] = useState("");
+
+  const fetchDocuments = async () => {
+    try {
+      const docs = await getDocuments();
+      setDocuments(docs);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
-    // 🔌 BACKEND: replace mock with real getDocuments call
-    getDocuments().then(setDocuments);
+    fetchDocuments();
   }, []);
+
+  // Poll for status updates if any document is processing
+  useEffect(() => {
+    const isProcessing = documents.some((doc) => doc.status === "processing");
+    if (!isProcessing) return;
+
+    const intervalId = setInterval(() => {
+      fetchDocuments();
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, [documents]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -46,6 +72,13 @@ export function UniversityDashboard() {
   };
 
   const handleFiles = (files: FileList) => {
+    setPendingFiles(Array.from(files));
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmUpload = async () => {
+    if (!facultyName || !departmentName) return;
+    setIsModalOpen(false);
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -60,22 +93,28 @@ export function UniversityDashboard() {
       });
     }, 150);
 
-    // 🔌 BACKEND: replace mock with real uploadDocuments call
-    uploadDocuments(Array.from(files))
-      .then((newDocs) => {
-        clearInterval(interval);
-        setUploadProgress(100);
-        setDocuments((prev) => [...newDocs, ...prev]);
-        setTimeout(() => {
-          setIsUploading(false);
-          setUploadProgress(0);
-        }, 400);
-      })
-      .catch(() => {
-        clearInterval(interval);
+    try {
+      const newDocs = await uploadDocuments(pendingFiles, facultyName, departmentName);
+      clearInterval(interval);
+      setUploadProgress(100);
+      setTimeout(() => {
         setIsUploading(false);
         setUploadProgress(0);
-      });
+        setFacultyName("");
+        setDepartmentName("");
+        setPendingFiles([]);
+        fetchDocuments(); // Refresh list to get real IDs from backend
+      }, 400);
+    } catch (e) {
+      clearInterval(interval);
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setPendingFiles([]);
   };
 
   const handleLogout = () => {
@@ -245,6 +284,55 @@ export function UniversityDashboard() {
                   </li>
                 </ul>
               </div>
+
+              {/* Upload Modal */}
+              {isModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Regulation Details</h3>
+                    <p className="text-sm text-gray-600 mb-6">
+                      Please specify the faculty and department for the {pendingFiles.length} selected file(s).
+                    </p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Faculty Name</label>
+                        <input
+                          type="text"
+                          placeholder="e.g., Engineering"
+                          value={facultyName}
+                          onChange={(e) => setFacultyName(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+                        <input
+                          type="text"
+                          placeholder="e.g., Computer Science"
+                          value={departmentName}
+                          onChange={(e) => setDepartmentName(e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-3 mt-8">
+                      <button
+                        onClick={handleCloseModal}
+                        className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleConfirmUpload}
+                        disabled={!facultyName || !departmentName}
+                        className="flex-1 px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                      >
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -11,13 +11,13 @@ class AdminService:
         if not requester or not requester.is_super_admin:
             raise PermissionError("Only Super Admin can create other admins")
         
-        existing = db.query(Admin).filter(Admin.email == request.email).first()
+        existing = db.query(Admin).filter(Admin.email == request.email.lower()).first()
         if existing:
             raise ValueError("Admin with this email already exists")
 
         new_admin = Admin(
             name=request.name,
-            email=request.email,
+            email=request.email.lower(),
             password=hash_password(request.password),
             is_super_admin=False
         )

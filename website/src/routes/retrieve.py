@@ -31,13 +31,21 @@ def answer_router(request:retrievalRequest, db:Session=Depends(get_db), current_
             if not profile:
                 raise HTTPException(status_code=400, detail="Student profile not found. Cannot determine department.")
                 
-            department = db.query(Department).filter(
-                Department.faculty_id == user.faculty_id,
-                Department.name == profile.department
+            from models.faculty_model import Faculty
+            from sqlalchemy import func
+            department = db.query(Department).join(Faculty, Department.faculty_id == Faculty.id).filter(
+                func.lower(Faculty.name) == func.lower(profile.faculty),
+                func.lower(Department.name) == func.lower(profile.department)
             ).first()
             
             if not department:
-                raise HTTPException(status_code=400, detail="Department not found for the student's profile.")
+                # Fallback: Match by department name only
+                department = db.query(Department).filter(
+                    func.lower(Department.name) == func.lower(profile.department)
+                ).first()
+                
+            if not department:
+                raise HTTPException(status_code=400, detail=f"Department '{profile.department}' not found for the student's profile.")
                 
             request.department_id = department.id
         else:

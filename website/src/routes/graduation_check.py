@@ -6,6 +6,8 @@ from models.user_model import Student
 from models.student_profile_model import StudentProfile
 from models.term_grades_model import TermGrades
 from models.course_model import Course
+from models.academic_plan_model import AcademicPlan
+from sqlalchemy import func
 
 graduation_check_router = APIRouter()
 
@@ -58,10 +60,14 @@ async def check_graduation_eligibility(
         standing = "Academic Warning"
 
     # Default profile values if not created
-    total_req_hours = profile.total_required_credit_hours if profile else 0
-    mandatory_req = profile.mandatory_credit_hours if profile else 0
-    elective_req = profile.elective_credit_hours if profile else 0
-    major_req = profile.major_credit_hours if profile else 0
+    plan = None
+    if profile:
+        plan = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(profile.department)).first()
+
+    total_req_hours = plan.total_required_credit_hours if plan else 0
+    mandatory_req = plan.mandatory_credit_hours if plan else 0
+    elective_req = plan.elective_credit_hours if plan else 0
+    major_req = plan.major_credit_hours if plan else 0
 
     # Checks
     hours_check = passed_hours >= total_req_hours if total_req_hours > 0 else False

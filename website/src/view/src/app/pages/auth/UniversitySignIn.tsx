@@ -23,12 +23,15 @@ export function UniversitySignIn() {
     setError("");
     setIsLoading(true);
     try {
-      // 🔌 BACKEND: replace mock with real loginUniversity call
       const { user, token } = await loginUniversity(formData.email, formData.password);
       login(user, token);
       navigate("/university");
-    } catch {
-      setError("Invalid email or password. Please try again.");
+    } catch (err: any) {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

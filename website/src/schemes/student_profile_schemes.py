@@ -10,12 +10,6 @@ class StudentProfileRequest(BaseModel):
     department: str
     enrollmentYear: int
     expectedGraduationYear: int
-    totalRequiredCreditHours: int
-    mandatoryCreditHours: int
-    electiveCreditHours: int
-    majorCreditHours: int
-    curriculumPdfName: Optional[str] = None
-    curriculumPdfBase64: Optional[str] = None
 
 
 class StudentProfileResponse(BaseModel):
@@ -26,11 +20,12 @@ class StudentProfileResponse(BaseModel):
     department: str
     enrollmentYear: int
     expectedGraduationYear: int
-    totalRequiredCreditHours: int
-    mandatoryCreditHours: int
-    electiveCreditHours: int
-    majorCreditHours: int
+    totalRequiredCreditHours: int = 0
+    mandatoryCreditHours: int = 0
+    electiveCreditHours: int = 0
+    majorCreditHours: int = 0
     curriculumPdfName: Optional[str] = None
+    curriculumPdfPath: Optional[str] = None
 
     class Config:
         from_attributes = True

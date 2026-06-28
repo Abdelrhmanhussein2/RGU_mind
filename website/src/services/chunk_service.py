@@ -56,7 +56,7 @@ class ChunkService:
             # fitz للنص
             pdf_fitz = fitz.open(stream=BytesIO(file), filetype="pdf")
 
-            for page_num in range(min(10, len(pdf_fitz))):
+            for page_num in range(len(pdf_fitz)):
                 page_content = ""
 
                 # 1.الجداول بـ pdfplumber

@@ -27,7 +27,7 @@ export function UniversityOtpVerification() {
     try {
       // 🔌 BACKEND: replace mock with real verifyOtp call
       await verifyOtp(email, otp, "university");
-      navigate("/university/reset-password", { state: { email } });
+      navigate("/university/reset-password", { state: { email, otp } });
     } catch {
       setError("Invalid or expired code. Please try again.");
     } finally {
