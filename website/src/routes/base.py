@@ -10,6 +10,7 @@ from .notifications import notifications_router
 from .retrieve import rerival_router
 from .academic_plans import academic_plans_router
 from .university import university_router
+from .study_planner import study_planner_router
 
 base_router = APIRouter()
 base_router.include_router(auth_router, prefix="/auth")
@@ -23,3 +24,4 @@ base_router.include_router(graduation_check_router, prefix="/student")
 base_router.include_router(notifications_router, prefix="/notifications")
 base_router.include_router(rerival_router, prefix="/retrieval")
 base_router.include_router(academic_plans_router, prefix="/academic-plans")
+base_router.include_router(study_planner_router, prefix="/student")
