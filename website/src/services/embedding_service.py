@@ -130,7 +130,7 @@ class EmbeddingService:
             collection_name=self.collection_name,
             query=query_embedding,
             limit=top_k,
-            score_threshold=0.5,
+            score_threshold=0.35,
             query_filter=Filter(
                 must=[
                     FieldCondition(

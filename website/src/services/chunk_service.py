@@ -9,15 +9,27 @@ import uuid
 import re
 from collections import Counter
 
+# Keywords that indicate a section heading for course lists
+SECTION_KEYWORDS = [
+    "اختياري", "إجباري", "إلزامي", "تخصص", "متطلب", "عام",
+    "elective", "compulsory", "mandatory", "required", "optional",
+    "المقررات", "المواد", "مواد", "مقررات", "courses", "subjects"
+]
+
 class ChunkService:
     def __init__(self):
         self.splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=50,
+            chunk_size=600,
+            chunk_overlap=80,
             separators=["\n\n", "\n", ". ", "? ", "! ", " "]
         )
         # Generic Course Code Regex: e.g. CS 101, MATH201, حاسب 101, ريض201
         self.code_pattern = re.compile(r'(?:[A-Za-z]{2,4}|[أ-ي]{2,4})\s*[A-Za-z]?\s*[0-9xX]{2,4}')
+        # Pattern to detect a section heading: short line (< 80 chars) with a section keyword
+        self.section_pattern = re.compile(
+            r'^.{0,80}(?:' + '|'.join(SECTION_KEYWORDS) + r').{0,80}$',
+            re.MULTILINE | re.IGNORECASE
+        )
 
     def fix_arabic_text(self, text: str) -> str:
         if not text:
@@ -43,6 +55,28 @@ class ChunkService:
         lines = [l for l in lines if l not in repeated_lines and not re.fullmatch(r'[A-Z]\d+', l)]
         return "\n".join(lines)
 
+    def detect_section_label(self, page_text: str, table_bbox) -> str:
+        """
+        Scan page text lines ABOVE the table bounding box to find the nearest
+        section heading (e.g. 'المواد الاختيارية التخصصية').
+        Returns the label string or empty string if none found.
+        """
+        if not page_text:
+            return ""
+        
+        lines = [l.strip() for l in page_text.split("\n") if l.strip()]
+        
+        # Walk lines in reverse to find the last section heading before the table
+        section_label = ""
+        for line in reversed(lines):
+            if len(line) > 80:
+                continue  # Too long to be a heading
+            if self.section_pattern.search(line):
+                section_label = line
+                break
+        
+        return section_label
+
     def create_chunk(self, db: Session, file: bytes, document_id: UUID, filename: str):
         result_chunks = []
         chunk_index = 0
@@ -53,6 +87,9 @@ class ChunkService:
         for page_num in range(len(pdf_fitz)):
             page = pdf_fitz[page_num]
             page_content = ""
+            
+            # Get full page text for section label detection
+            raw_page_text = page.get_text("text")
 
             # 1. Dynamic Table Extraction
             tabs = page.find_tables()
@@ -63,34 +100,35 @@ class ChunkService:
 
                 full_table_text = " ".join([str(item) for row in table_data for item in row if item])
                 
+                # Detect section label from page text above this table
+                section_label = self.detect_section_label(raw_page_text, tab.bbox if hasattr(tab, 'bbox') else None)
+                label_prefix = f"[{section_label}] " if section_label else ""
+
                 # If it's a detail box (like course syllabus)
                 is_detail_box = any(k in full_table_text for k in ["المحتوى", "محتوى", "اسم المقرر", "وصف المقرر"])
                 
                 if is_detail_box:
                     clean_cells = [self.fix_arabic_text(str(c)) for row in table_data for c in row if c]
                     box_text = " | ".join(clean_cells)
-                    page_content += f"\nتفاصيل المقرر (من الصندوق): {box_text}\n"
+                    page_content += f"\n{label_prefix}تفاصيل المقرر (من الصندوق): {box_text}\n"
                     continue
 
                 # Regular Row-by-Row Extraction
+                code_pattern = re.compile(r'(?:[A-Za-z]{2,4}|[أ-ي]{2,4})\s*[A-Za-z]?\s*[0-9xX]{2,4}')
+
                 for row in table_data:
                     clean_row = [self.fix_arabic_text(str(c)) for c in row if c]
                     if not clean_row:
                         continue
 
-                    # Generic Course Code Regex: e.g. CS 101, ENG X61, حاسب 101, Cxx4x1
-                    code_pattern = re.compile(r'(?:[A-Za-z]{2,4}|[أ-ي]{2,4})\s*[A-Za-z]?\s*[0-9xX]{2,4}')
-                    
                     codes_found = [c for c in clean_row if code_pattern.search(c)]
                     credits_found = [c for c in clean_row if c.strip().isdigit() and len(c.strip()) == 1]
                     
-                    # Exclude cells that look like a credit prerequisite (e.g., '112 Cr. H')
                     def is_prereq(text):
                         t = text.lower()
                         return any(kw in t for kw in ['cr', 'credit', 'ساعة', 'ساعات', 'متطلب'])
                     
                     prereqs_without_code = [c for c in clean_row if len(c) > 5 and is_prereq(c) and not code_pattern.search(c)]
-                    
                     names_found = [c for c in clean_row if len(c) > 5 and not code_pattern.search(c) and not c.strip().isdigit() and not is_prereq(c)]
 
                     if codes_found and names_found:
@@ -105,20 +143,20 @@ class ChunkService:
                         extra_info = [c for c in clean_row if c not in used_cells]
                         extra_str = ("، معلومات إضافية: " + " | ".join(extra_info)) if extra_info else ""
 
+                        # ✅ Prefix with section label so embeddings carry context
                         desc_text = (
-                            f"مادة: {main_name}، كود المقرر: {main_code}، "
+                            f"{label_prefix}مادة: {main_name}، كود المقرر: {main_code}، "
                             f"الساعات المعتمدة: {credits}، المتطلب السابق: {prereq_str}{extra_str}."
                         )
                         page_content += "\n" + desc_text + "\n"
                     else:
-                        # Just regular table content if it's not a course row
+                        # Regular table row (not a course row)
                         if any(clean_row):
-                            page_content += " | ".join(clean_row) + "\n"
+                            page_content += f"{label_prefix}" + " | ".join(clean_row) + "\n"
 
             # 2. Page Text
-            text = page.get_text("text")
-            if text.strip():
-                page_content += "\n" + text
+            if raw_page_text.strip():
+                page_content += "\n" + raw_page_text
 
             if page_content.strip():
                 pages_text.append((page_num + 1, page_content))
@@ -130,13 +168,13 @@ class ChunkService:
         
         all_final_chunks = []
 
-        # Add general text chunks
+        # Build final chunks with section-aware splitting
         for page_num, page_content in pages_text:
             clean = self.clean_text(page_content, repeated)
             if not clean.strip():
                 continue
 
-            # Append detected codes at the top of the page chunk if found (metadata enrichment)
+            # Metadata enrichment: prepend detected codes
             codes_on_page = self.code_pattern.findall(clean)
             if codes_on_page:
                 clean = f"الأكواد الموجودة في هذه الصفحة: {', '.join(set(codes_on_page))}\n" + clean
