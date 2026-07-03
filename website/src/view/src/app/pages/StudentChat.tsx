@@ -25,6 +25,9 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "../lib/notifications";
+import ReactMarkdown from "react-markdown";
+
+const isArabic = (text: string) => /[\u0600-\u06FF]/.test(text);
 
 interface Message {
   id: string;
@@ -260,8 +263,8 @@ export function StudentChat() {
                       <div className="flex items-start gap-2">
                         {!n.read && <span className="w-2 h-2 mt-1.5 rounded-full bg-indigo-600 flex-shrink-0" />}
                         <div className={n.read ? "ml-4" : ""}>
-                          <p className="text-sm font-medium text-gray-900">{n.title}</p>
-                          <p className="text-xs text-gray-600 mt-0.5">{n.message}</p>
+                          <p dir="auto" className="text-sm font-medium text-gray-900">{n.title}</p>
+                          <p dir="auto" className="text-xs text-gray-600 mt-0.5">{n.message}</p>
                           <p className="text-xs text-gray-400 mt-1">
                             {new Date(n.timestamp).toLocaleString()}
                           </p>
@@ -340,11 +343,33 @@ export function StudentChat() {
                           : "bg-white border border-gray-200"
                       }`}
                     >
-                      <p className={`leading-relaxed whitespace-pre-line ${
+                      <div 
+                        dir={isArabic(message.content) ? "rtl" : "ltr"}
+                        className={`leading-relaxed ${
                         message.role === "user" ? "text-white" : "text-gray-900"
                       }`}>
-                        {message.content}
-                      </p>
+                        {message.role === "user" ? (
+                          <p className="whitespace-pre-line">{message.content}</p>
+                        ) : (
+                          <ReactMarkdown
+                            components={{
+                              p: ({ node, ...props }) => <p className="mb-2 last:mb-0 text-start" {...props} />,
+                              ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 text-start" {...props} />,
+                              ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-2 text-start" {...props} />,
+                              li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                              h1: ({ node, ...props }) => <h1 className="text-xl font-bold mb-2 text-start" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="text-lg font-bold mb-2 text-start" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="text-md font-bold mb-2 text-start" {...props} />,
+                              strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+                              table: ({ node, ...props }) => <div className="overflow-x-auto mb-2"><table className="min-w-full divide-y divide-gray-200 border text-start" {...props} /></div>,
+                              th: ({ node, ...props }) => <th className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider text-start border-b" {...props} />,
+                              td: ({ node, ...props }) => <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 border-b text-start" {...props} />,
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        )}
+                      </div>
 
                       {message.role === "assistant" && (
                         <div className="mt-4 flex items-center gap-3">
@@ -386,10 +411,10 @@ export function StudentChat() {
                                 key={idx}
                                 className="p-3 bg-indigo-50 rounded-lg border border-indigo-100"
                               >
-                                <p className="text-sm font-medium text-indigo-900">
+                                <p dir="auto" className="text-sm font-medium text-indigo-900">
                                   {source.title}
                                 </p>
-                                <p className="text-xs text-indigo-700 mt-1">
+                                <p dir="auto" className="text-xs text-indigo-700 mt-1">
                                   {source.section}
                                 </p>
                               </div>
@@ -436,6 +461,7 @@ export function StudentChat() {
               className="relative"
             >
               <textarea
+                dir="auto"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {

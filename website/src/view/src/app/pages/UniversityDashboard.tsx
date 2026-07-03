@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Upload, FileText, Settings, CheckCircle, Clock, Brain, LogOut, Home } from "lucide-react";
-import { getDocuments, uploadDocuments } from "../../services/documentService";
-import { logout } from "../../services/authService";
+import { getDocuments, uploadDocuments, resetRegulation } from "../../services/documentService";
+import { logout, updateUniversityProfile } from "../../services/authService";
 import { useAuth } from "../../store/authStore";
 
 interface Document {
@@ -14,7 +14,7 @@ interface Document {
 
 export function UniversityDashboard() {
   const navigate = useNavigate();
-  const { logout: authLogout } = useAuth();
+  const { state, logout: authLogout } = useAuth();
   const [activeTab, setActiveTab] = useState<"upload" | "documents" | "settings">("upload");
   const [documents, setDocuments] = useState<Document[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -26,6 +26,22 @@ export function UniversityDashboard() {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [facultyName, setFacultyName] = useState("");
   const [departmentName, setDepartmentName] = useState("");
+  
+  // Reset Modal state
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetFacultyName, setResetFacultyName] = useState("");
+  const [resetDepartmentName, setResetDepartmentName] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
+  
+  // Toast state
+  const [successToastMessage, setSuccessToastMessage] = useState("");
+
+  // Profile Update state
+  const [profileName, setProfileName] = useState(state.user?.name || "");
+  const [profileEmail, setProfileEmail] = useState(state.user?.email || "");
+  const [isProfilePasswordModalOpen, setIsProfilePasswordModalOpen] = useState(false);
+  const [profilePassword, setProfilePassword] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   const fetchDocuments = async () => {
     try {
@@ -117,10 +133,44 @@ export function UniversityDashboard() {
     setPendingFiles([]);
   };
 
+  const handleResetRegulation = async () => {
+    if (!resetFacultyName || !resetDepartmentName) return;
+    setIsResetting(true);
+    try {
+      await resetRegulation(resetFacultyName, resetDepartmentName);
+      setSuccessToastMessage(`Successfully reset regulations for ${resetFacultyName} - ${resetDepartmentName}`);
+      setTimeout(() => setSuccessToastMessage(""), 5000);
+      setIsResetModalOpen(false);
+      setResetFacultyName("");
+      setResetDepartmentName("");
+      fetchDocuments();
+    } catch (e: any) {
+      alert("Failed to reset regulations: " + (e.response?.data?.detail || e.message));
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const handleLogout = () => {
     logout();
     authLogout();
     navigate("/");
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!profilePassword) return;
+    setIsUpdatingProfile(true);
+    try {
+      await updateUniversityProfile(profileName, profileEmail, profilePassword);
+      setSuccessToastMessage("Successfully updated profile");
+      setTimeout(() => setSuccessToastMessage(""), 5000);
+      setIsProfilePasswordModalOpen(false);
+      setProfilePassword("");
+    } catch (e: any) {
+      alert("Failed to update profile: " + (e.response?.data?.detail || e.message));
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
 
   return (
@@ -389,6 +439,8 @@ export function UniversityDashboard() {
                     <input
                       type="text"
                       placeholder="Enter university name"
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
                       className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
@@ -400,19 +452,141 @@ export function UniversityDashboard() {
                     <input
                       type="email"
                       placeholder="admin@university.edu"
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
                       className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
 
-                  <button className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                  <button 
+                    onClick={() => setIsProfilePasswordModalOpen(true)}
+                    className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
                     Save Changes
                   </button>
+
+                  <hr className="my-6 border-gray-200" />
+                  
+                  <div>
+                    <h4 className="text-lg font-medium text-red-600 mb-2">Danger Zone</h4>
+                    <p className="text-sm text-gray-600 mb-4">Reset regulations and documents for a specific faculty and department.</p>
+                    <button 
+                      onClick={() => setIsResetModalOpen(true)}
+                      className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                      Reset Regulations
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
         </div>
       </main>
+
+      {/* Password Modal */}
+      {isProfilePasswordModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Confirm Changes</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Please enter your password to confirm and save these changes.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={profilePassword}
+                  onChange={(e) => setProfilePassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => setIsProfilePasswordModalOpen(false)}
+                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={isUpdatingProfile}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateProfile}
+                disabled={!profilePassword || isUpdatingProfile}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              >
+                {isUpdatingProfile ? "Saving..." : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Modal */}
+      {isResetModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h3 className="text-xl font-bold text-red-600 mb-4">Reset Regulations</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Please specify the faculty and department to reset. This action cannot be undone.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Faculty Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Engineering"
+                  value={resetFacultyName}
+                  onChange={(e) => setResetFacultyName(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Computer Science"
+                  value={resetDepartmentName}
+                  onChange={(e) => setResetDepartmentName(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => setIsResetModalOpen(false)}
+                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={isResetting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetRegulation}
+                disabled={!resetFacultyName || !resetDepartmentName || isResetting}
+                className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {isResetting ? "Resetting..." : "Reset"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {successToastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="bg-white border border-green-200 rounded-lg shadow-lg p-4 flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-500" />
+            <p className="text-gray-900 font-medium">{successToastMessage}</p>
+            <button 
+              onClick={() => setSuccessToastMessage("")}
+              className="text-gray-400 hover:text-gray-600 transition-colors ml-4"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

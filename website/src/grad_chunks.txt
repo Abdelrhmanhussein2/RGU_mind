@@ -1,0 +1,892 @@
+--- CHUNK ID e2bd0598-cdd4-4523-a9e0-7ffb050a6ec2
+مادة: Graduation Project (1)، كود المقرر: ARE481، الساعات المعتمدة: 2، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 08ce4fc2-7e03-4f23-8c17-5a4ba4b8c306
+مادة: Graduation Project (2)، كود المقرر: ARE482، الساعات المعتمدة: 7، المتطلب السابق: ARE481.
+--- CHUNK ID f4d8e9e2-71d7-4dec-bf3e-067c1c961e29
+مادة: Cxx4x1 Graduation project (A) مشروع التخرج (أ)، كود المقرر: ENGX61+
+HUMX32+
+112 Cr or
+more، الساعات المعتمدة: 1، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 8e0c1ae2-1eba-4f27-bcc1-e0cf9886fbce
+مادة: Graduation Project (1) مشروع التخرج (1)، كود المقرر: EPE 461، الساعات المعتمدة: 1، المتطلب السابق: ENGX61+
+HUMX32+
+112 Cr or
+more.
+--- CHUNK ID 30d6ca15-9d48-4a78-8b35-a973591e8155
+مادة: Graduation Project (2) مشروع التخرج (2)، كود المقرر: EPE 462، الساعات المعتمدة: 3، المتطلب السابق: EPE 461.
+--- CHUNK ID fb66372e-3d64-4f9b-ab13-3e1b2a774940
+مادة: Graduation Project (1)، كود المقرر: EPE 461، الساعات المعتمدة: 1، المتطلب السابق: ENGX61+
+HUMX32+112
+Cr or more.
+--- CHUNK ID 96ee056a-6f5d-415c-b3f2-b310aeb0b377
+مادة: Graduation Project (2)، كود المقرر: EPE 462، الساعات المعتمدة: 3، المتطلب السابق: EPE 461.
+--- CHUNK ID 9ca57c26-0160-4211-aa12-15b548352b5a
+مادة: Graduation Project (1)، كود المقرر: EPE 461، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 7ae73874-416e-4e4f-bbf3-939dac728abe
+مادة: Graduation Project (2)، كود المقرر: EPE 462، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 3d5b7e4b-8a67-45dc-b2de-b2848fd57542
+مادة: Graduation Project (B) مشروع التخرج (ب)، كود المقرر: EEC 482، الساعات المعتمدة: 3، المتطلب السابق: EEC481.
+--- CHUNK ID 68f326de-cfa7-4342-b15f-8023f0c88f48
+مادة: Graduation Project (B)، كود المقرر: EEC 482، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 32a88a91-9bf3-418a-a372-2c508eb72451
+مادة: Graduation Project (B)، كود المقرر: EEC 482، الساعات المعتمدة: 3، المتطلب السابق: EEC481.
+--- CHUNK ID 1d405f4f-6811-4368-8d98-262d469fd1a5
+مادة: Graduation project (A) مشروع التخرج (ا)، كود المقرر: CCE 461، الساعات المعتمدة: 1، المتطلب السابق: 23X
+GNE + MUH
+معتمدة + 16X
+الطالب 211ساعة
+** يجب أن يجتاز.
+--- CHUNK ID df478e6a-1587-4ce7-9396-c368a99ddd10
+مادة: Graduation project (B) مشروع التخرج (ب)، كود المقرر: CCE 462، الساعات المعتمدة: 3، المتطلب السابق: CCE 461.
+--- CHUNK ID 4c939d36-fd5e-4dd7-b87e-b7fb2c3831c5
+مادة: Graduation Project (A)، كود المقرر: CCE 461، الساعات المعتمدة: 1، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 45273bfb-0aa3-43a3-b0f6-8c3f7710c4af
+مادة: Graduation Project (B)، كود المقرر: CCE 462، الساعات المعتمدة: 3، المتطلب السابق: CCE 461.
+--- CHUNK ID f9d9824d-0532-4dc1-bd2d-c2e4e7ce8133
+مادة: Graduation Project (A) مشروع التخرج (أ)، كود المقرر: PDE 451، الساعات المعتمدة: 1، المتطلب السابق: HUM X32,
+ENG X61,
+112 CR.
+--- CHUNK ID 9fc9aa45-89c3-4d7e-8b11-a1ad14bb4a16
+مادة: Graduation Project (B) مش روع التخرج (ب)، كود المقرر: PDE 452، الساعات المعتمدة: 3، المتطلب السابق: PDE 451.
+--- CHUNK ID 33a56c75-cb20-44f5-8b28-5d7cd06cc2c0
+مادة: Graduation Project (A)، كود المقرر: PDE 45A، الساعات المعتمدة: 1، المتطلب السابق: HUM X32,
+ENG X61,
+112 Cr.
+--- CHUNK ID dd65d25f-381a-4eca-85c3-b4b297d36316
+مادة: Graduation Project (B)، كود المقرر: PDE 45B، الساعات المعتمدة: 3، المتطلب السابق: PDE 45A.
+--- CHUNK ID 064abb4c-69c3-4fb0-b167-485575fd56e8
+مادة: Graduation project (A) مشروع التخرج (ا)، كود المقرر: MPE 454، الساعات المعتمدة: 1، المتطلب السابق: Earn ≥ 112 Cr
+ENGX61+ HUMX32.
+--- CHUNK ID 303be1df-5ef1-4e89-b481-ddb7f1a0995f
+مادة: Graduation project (B) مشروع التخرج (ب)، كود المقرر: MPE 455، الساعات المعتمدة: 3، المتطلب السابق: MPE 454.
+--- CHUNK ID 50120fd8-023a-4294-9f83-6c715efc7e2f
+مادة: Graduation project (A، كود المقرر: MPE454، الساعات المعتمدة: 1، المتطلب السابق: + 112 Cr
+ENGX61+
+HUMX32.
+--- CHUNK ID 28ec412a-2393-4d9c-ab46-7967bc7dd5f7
+مادة: Graduation project (B)، كود المقرر: MPE455، الساعات المعتمدة: 3، المتطلب السابق: MPE454.
+--- CHUNK ID 186e5928-b489-4b29-9a24-4a2e3758732f
+مادة: Graduation Project Studies، كود المقرر: EAE481، الساعات المعتمدة: 2، المتطلب السابق: معتمدة
+ساعة 211واكمال
+163EAE 213EAE.
+--- CHUNK ID 5dd06529-7940-4ed2-b0f7-879e751a3b9b
+مادة: Graduation Project، كود المقرر: EAE482، الساعات المعتمدة: 7، المتطلب السابق: EAE481.
+--- CHUNK ID 83b88da0-7a91-476b-805c-9d29d9fca9f3
+مادة: Graduation Project (1) مشروع التخرج (1)، كود المقرر: MPE 461، الساعات المعتمدة: 3، المتطلب السابق: أالكاديم
+موافقة المرشد +
+23XMU
++ 16XGNE
++211 ساعة معتمدة.
+--- CHUNK ID 0d3a6cac-8ef4-420f-a684-70204ea45109
+مادة: Graduation Project (2) مشروع التخرج (2)، كود المقرر: MPE 462، الساعات المعتمدة: 3، المتطلب السابق: MPE 461.
+--- CHUNK ID f62641f7-bddd-4889-b41d-21a8e6848c0b
+مادة: Graduation Project (1)، كود المقرر: MPE 461، الساعات المعتمدة: 3، المتطلب السابق: ENGX61 +
+HUMX32 +112
+Cr.
+--- CHUNK ID 79a0fa67-9ffd-4843-acde-d76b1578a555
+مادة: Graduation Project (2)، كود المقرر: MPE 462، الساعات المعتمدة: 3، المتطلب السابق: MPE 461.
+--- CHUNK ID ad0ed544-b346-4b13-8289-2f0147614b09
+مادة: Graduation Project (1) مشروع التخرج (1)، كود المقرر: EPE 471، الساعات المعتمدة: 1، المتطلب السابق: 112 Cr. H +
+ENGX61 +
+HUMX32.
+--- CHUNK ID ba9c52ed-31a9-4551-a811-1a8778c207ce
+مادة: Graduation Project (2) مشروع التخرج (2)، كود المقرر: EPE 472، الساعات المعتمدة: 3، المتطلب السابق: EPE 471.
+--- CHUNK ID 65143045-6b59-4611-984d-c715c19f4917
+مادة: Graduation Project (1)، كود المقرر: EPE 471، الساعات المعتمدة: 1، المتطلب السابق: 112 Cr. H +
+ENGX61 +
+HUMX32.
+--- CHUNK ID 32ce78c3-5f58-4419-b1c1-fb43e02c8253
+مادة: Graduation Project (2)، كود المقرر: EPE 472، الساعات المعتمدة: 3، المتطلب السابق: EPE 471.
+--- CHUNK ID b9a96de4-6eb6-4203-969d-3269f83d0b42
+مادة: Graduation Project (1)، كود المقرر: EPE 471، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 6138a297-318b-4840-90cf-1655cc426822
+مادة: Graduation Project (2)، كود المقرر: EPE 472، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 41092b89-89a3-4663-97e8-af23e09b62b3
+theaters, etc). the use of computational applications in acoustic and artificial lightning design.
+Course Title | Graduation Project (1)
+Course Content: The course aims to work on the graduation project to show the student’s ability to address and
+solve the technical and technical problems presented. The project reflects the student’s outcome of the
+knowledge and skills that he acquired during his studies in an integrated scientific manner, and that the project
+--- CHUNK ID a6083508-a124-4878-97a2-61fb4a5b4bc5
+Course Title | Graduation Project (2)
+Core | 7 | 2 | 0 | 14 | 16
+Course Content: The student makes the architectural designs for the graduation project whose program has been
+prepared and its location in the first semester - and it is of the type of projects of a comprehensive complex nature
+to show the student’s ability to deal with it with all the backgrounds that have been acquired throughout the
+--- CHUNK ID 5ba5dbaa-4f9a-4c22-9294-3e2933bf6db2
+الأكواد الموجودة في هذه الصفحة: CWR 342, لى20, تمثل
+20, CSE 361, otal 160, عدد32
+5. | Cxx4x2 | Graduation project (B) | مشروع التخرج (ب) | 3 | Cxx4x1
+Total Credit Hours | 12
+D-15
+متطلبات التخصص الدقيق PR
+يجب على ا لطالب الذي يرغب في إكمال
+تخصص الدقيق أن يكمل الحد األدنى من المتطلبات وهي
+ساعة معتمدة إجبارية باإلضافة
+إ لى20
+إختيارية
+بإجمالي عدد32
+ساعة معتمدة تمثل
+20,00
+كما هو مبين في الجدول
+التالي ،
+وهو مطابق للحدود المقترحة من
+اإلط.ار المرجعي
+جدول( .
+- )أ
+قائمة مقررات
+تخصص اإلجبارية
+--- CHUNK ID 3d88689d-b529-4b10-9872-a202f7fb6d1d
+الأكواد الموجودة في هذه الصفحة: HUMX32, MPEX51, ENGX61
+CVE4×1 | Graduation Project (A) | 1 | 1 | 0 | 1 | 2 | *** | -
+C××4E5 | Specialized Elective Course (5)
+Table (4-G) | 3 | 2 | 2 | 0 | 4 | Table (4-G) | 3
+C××4E6 | Specialized Elective Course (6)
+Table(4-H) | 3 | 2 | 2 | 0 | 4 | Table (4-H) | 2
+C××4E7 | Specialized Elective Course (7)
+Table (4-I) | 2 | 2 | 1 | 0 | 3 | Table (4-I) | 2
+Total | 14 | 12 | 5 | 2 | 19
+EMP×E× | Elective Course – Fac. Req.
+--- CHUNK ID 039c9615-b480-47ca-a04d-2864ffccf4eb
+EMP×E× | Elective Course – Fac. Req.
+ARC4×1 | Architecture Construction | 1 | 1 | 1 | 0 | 2 | - | 3
+C××4E8 | Specialized Elective Course (8)
+Table (4-K) | 1 | 1 | 0 | 1 | 2 | Table (4-K) | 2
+MPE/EPE4
+×1 | Electrical and Mechanical
+Fittings | 1 | 1 | 1 | 0 | 2 | - | 2
+CVE4×2 | Graduation Project (B) | 3 | 2 | 0 | 2 | 4 | CVE4×1 | -
+HUM×E× | Elective Course – Un. Req.
+Table 1-B | 2 | 2 | 0 | 0 | 2 | - | 1
+Total | 13 | 11 | 5 | 3 | 19
+D-56
+MPEX51
+C××4E5
+Specialized Elective Course (5)
+Table (4-G)
+--- CHUNK ID dad2b953-2957-4a13-b973-d2a35dc8ef42
+2 | 1 | 2 | 0 | 2 | Major Requirements
+Course Content: Construction quantities - take-off principles - methods of measurement - writing the bill -
+measuring and valuation of works during project execution - updating and reporting – Applications in
+construction projects – preparation of construction specifications.
+Course title | Graduation Project -A
+1 | 1 | 0 | 1 | 2 | Compulsory
+Course Content: The aim of the project is to provide the students, who work in groups, with an opportunity to
+--- CHUNK ID f9d687ee-cfb8-4782-996d-f75536f470ad
+CSE462
+Major Requirements
+Course Content: Construction quantities - take-off principles - methods of measurement - writing the bill -
+measuring and valuation of works during project execution - updating and reporting – Applications in
+construction projects – preparation of construction specifications.
+Graduation Project -A
+C×× 4X1
+ENGX61+ HUMX32+
+112 Cr or more
++ Academic Advisor
+Approval
+--- CHUNK ID 6c05e060-645d-4faf-b291-e222e52e478d
+Course title | Graduation Project - B
+course code | C×× 4X2 | Prerequisite | C×× 4X1
+3 | 2 | 0 | 2 | 4 | Compulsory
+Course Content: All students undertake a major project as part of the program. The aim of the project is to
+provide the students, who work in groups, with an opportunity to implement the appropriate concepts and
+techniques to a particular design. A dissertation on the project is submitted on which the student is examined
+orally.
+D-66
+Graduation Project - B
+C×× 4X2
+C×× 4X1
+--- CHUNK ID 6b2228ba-7278-4eae-8c55-1c44b7cda7c5
+D-66
+Graduation Project - B
+C×× 4X2
+C×× 4X1
+Course Content: All students undertake a major project as part of the program. The aim of the project is to
+provide the students, who work in groups, with an opportunity to implement the appropriate concepts and
+techniques to a particular design. A dissertation on the project is submitted on which the student is examined
+orally.
+--- CHUNK ID 770cc3c1-4025-4482-8082-df3d9f53226c
+Electrical power | القوى الكهربية | 2
+Electrical Machines | آالالت الكهربية | 3
+Power Electronics | إلكترونيات القوي | 4
+Electrical Systems | األنظمة الكهربية | 5
+Graduation Project | مشروع التخرج | 6
+في كود مقررات متطلبات
+التخصص العام والدقيق-
+برنامج هندسة القوى الكهربية
+Electrical power
+إلكترونيات القوي
+األنظمة الكهربية
+Electrical Systems
+--- CHUNK ID 6bf27630-a853-4619-bce4-c850a20a71ae
+تحليل نظم
+EPE 323 High Voltage Engineering هندسة الجهد العالي
+EPE 431 Special Machines آالت خاصة
+EPE 432 Control of Electrical Machines  التحكم في اآلالت الكهربية
+EPE 421 Protection of Electrical Power Systems وقاية نظم القوي الكهربية
+EPE 422 Applications of Electrical Protection Systems
+تطبيقات نظم الوقاية
+EPE 423 Control of Electrical Power Systems
+التحكم في نظم القوى
+EPE 461 Graduation Project  (1)
+EPE 462 Graduation Project  (2)
+--- CHUNK ID 14ba8c6f-c094-4519-bf7b-5e57ca5a385d
+الأكواد الموجودة في هذه الصفحة: EEC 481, ENG161, طالب112, EEC 417, EEC 351, EEC 437, دقيق15, EEC 446, يقية
+11, HUMX32, EEC 482, االت
+12, EEC 348, EEC 336
+الشبكات والعلوم التطبيقية
+مقرر اختياري تخصصي 1
+مقرر اختياري تخصصي 2
+F 10
+10. EEC 446
+معالجة الصور وتطبيقاتها
+الشبكات والعلوم التطبيقية
+11. EEC 351 Communication Networks
+شبكات االتصاالت
+12. EEC 481 Senior Project (A) مشروع التخرج-
+13. EEC 482 Graduation Project (B)
+*** يجب أن يجتاز الطالب112
++ساعة معتمدةENG161+HUMX32
+:ب
+--- CHUNK ID 17c26a31-aae8-4c36-ab0a-328547c2d4ec
+discrete event, combined, and other modeling – Techniques statistics of simulation analysis, Validation and
+Verification – Software Intensive Systems Applications – Current and future directions of simulation for a wide
+range of applications using MATLAB – High level programming language- Advanced applications.
+Senior Project (A) | Course title
+Discipline and Mandatory | 2 | 1 | 0 | 1 | 1
+Graduation Project (B) | Course title
+Discipline and Mandatory | 6 | 5 | 0 | 1 | 3
+F 51
+--- CHUNK ID 6cc42c72-d9b5-452e-a70d-266a6e75ee0a
+kinematics - Differential kinematics: Singularities and Jacobians - Mobile robots - Robot control -
+Motion planning - Robot operating systems (ROS).
+Graduation Project (A) | Course title
+Specialized Courses | 2 | 1 | 0 | 1 | 1
+Course Content: Topics are selected by groups of students according to their field of interest and based
+on the approval of the supervisors - Each group of students must give an oral presentation of the project
+--- CHUNK ID ec1dcbe8-884c-4333-b52a-2f7e82679a39
+Graduation Project (B) | Course title
+Specialized Courses | 5 | 4 | 0 | 1 | 3
+Course Content: Selecting the suitable technique for project topic - Main professional and practical part
+- Complete data processing – Writing the project report that contains conclusion and recommendations.
+G 51
+Course Content: Selecting the suitable technique for project topic - Main professional and practical part
+- Complete data processing – Writing the project report that contains conclusion and recommendations.
+--- CHUNK ID 198ece2e-e5e7-4af6-9e0a-7b3f8350775a
+Repeated response –Stability of linear control systems – Engineering locus of roots.
+Course title | Graduation Project (A)
+1 | 0 | 0 | 3 | 3 | PR – Mandatory
+Different projects in one of the different fields of specifications are prepared by the department each year and
+students are distributed to choose one of these according to the regulation put by the department.
+Course title | Die Design
+Introduction – Allowances and overrides in molds – Types of molds of metal components – Components of
+--- CHUNK ID efd87639-dd41-438e-a921-3b3611b0b0f6
+Sheet – Reviewing the Data and Making a Decision.
+Course title | Graduation Project (B)
+PDE 452 | PDE 451
+3 | 1 | 1 | 3 | 5 | PR – Mandatory
+H 61
+Composite Materials and Mechanical Properties of Polymers
+PDE 121, PDE 122
+Fibers And Their Types – Composing – Fibers and Plastics – Open Sand Closed Dies Processes To Produce Plastic
+Composites – Composites With Metallic Base – Composites With Ceramic Base – Other Composites (Concrete –
+Asphalt – Wood ).
+PDE  442
+--- CHUNK ID 3b42c558-2148-41ba-a2b5-e6e5c7bedf1d
+MPE424
+Automatic Control of Mechanical
+MPE442
+Technical Elective Course (1)
+Technical Elective Course (2)
+--
++ 112 Cr
+Graduation project (A
+Hydraulic and Pneumatic Circuits
+MPE425
+Turbo-machinery
+MPE426
+Technical Elective Course (3)
+Technical Elective Course (4)
+--- CHUNK ID 45645363-142f-4cb1-94b7-c1b189b5d573
+and efficiency losses - Axial flow compressors and fans - Velocity diagrams for single-stage compressor -
+Performance characteristics of Multistage compressors - Blade element theory - Best centrifugal compressor
+design - Slip factor - compressor stage impact - Centrifugal compressors and fans - Radial flow turbines - Wind
+turbines: (types, performance, design, and control)
+Graduation project (A) | Course title
+Earn 120 Cr or more +
+ENGX61+ HUMX32 | MPE454
+Prerequisite | course code
+--- CHUNK ID d80f05ea-33a2-4047-9de9-5a55f122a38f
+Graduation project (B) | Course title
+Technical Discipline - mandatory | 6 | 3 | 2 | 1 | 3
+Course Content: In the second part of the project, the student makes the necessary measurements and
+calculations – do a technical writing of the project – do an effective presentation of the project during the
+discussion
+I 59
+Hydraulic and Pneumatic Circuits
+MPE425
+Turbo-machinery
+MPE426
+Course Content: Introduction - Analysis of compressible and non-compressible fluids - Performance characteristics
+--- CHUNK ID c25dbeff-a652-497d-834f-d288868a17e7
+Urban Planning(1)
+Elective Course (Major) (6)
+Occupational Health and Safety
+University Requirement (2)
+EAE312  EAE361
+Graduation Project Studies
+Planning and Developing Sustainable
+Urban Communities
+Building Information  Modeling BIM
+Elective Course (Major) (3)
+Elective Course (Major) (4)
+Elective Course (Major) (5)
+--- CHUNK ID 9f70aab7-51e6-4da8-961e-85fabf51f47b
+course design.
+Sanitary Fixtures: kitchenwEAE and laundries - hydraulic facilities: water and sanitation - liquid waste and rainwater -
+sanitary equipment in buildings - problems and solutions - fire resistance needs - disposal of solid waste - architectural
+Course Title | Graduation Project Thesis
+Course Content: Graduation project aims to emphasis the student’s ability to deal with and handle technical issues
+--- CHUNK ID 8ef3a3dc-243f-40f1-b211-b596570232fd
+arose in his field. The project should cover and reflect a comprehensive compination of skills and knowledge gained by
+the student during his study in the program and it should be authentic and novel. Also, it should contain all the
+nessecary analatical studies. The student should submit a detailed report about his studies and criteria on which he will
+design the project according to the traditions of architectural practice.
+Course Title | Graduation Project
+Core | 7 | 2 | 0 | 10 | 12
+--- CHUNK ID 69c31f6f-9e22-48a1-a13a-2f02827d5688
+course design.
+Sanitary Fixtures: kitchenwEAE and laundries - hydraulic facilities: water and sanitation - liquid waste and rainwater -
+sanitary equipment in buildings - problems and solutions - fire resistance needs - disposal of solid waste - architectural
+Graduation Project Thesis
+EAE103
+EAE312 EAE362
+Course Content: Graduation project aims to emphasis the student’s ability to deal with and handle technical issues
+--- CHUNK ID 9d0e1783-54a2-4e40-ba65-d408e0f5c3c1
+Thermodynamics | الهندسة الحاررية | 2
+Fluid Mechanics | ميكانيكا الموائع | 3
+Combustion Systems | أنظمة ا لحتارق | 4
+Automatic Control | التحكم آاللي | 5
+Graduation Project | مشروع التخرج | 6
+L 7
+فى كود مقررات متطلبات
+التخصص العام والدقيق-
+هندسة الميكاترونيا
+الهندسة الحرارية
+أنظمة االحتراق
+Combustion Systems
+التحكم اآللي
+Automatic Control
+--- CHUNK ID d3c3daeb-c75b-43e3-988e-c4a1f351eb50
+MPE 354 Robotics روبوتات
+Digital Control Systems نظم التحكم الرقمي
+Object Oriented
+Programming and Data
+البرمجة الشيئية وهياكل
+البيانات
+Digital Signal Processing معالجة اإلشارة الرقمية
+MPE 441 Automotive Engineering هندسة السيارات
+MPE 451 Industrial Process Control
+التحكم في العمليات
+Advanced Robotics روبوتات متقدمة
+Numerical Control
+Machines CNC
+ماكينات التشغيل بالتحكم
+العددي
+Embedded Systems  األنظمة المدمجة
+MPE 461 Graduation Project (1) مشروع
+( التخرج1
+UMX32
++ موافقة المرشد
+األكاديم
+--- CHUNK ID deb45613-bc49-4422-88d8-320711d97c1a
+( التخرج1
+UMX32
++ موافقة المرشد
+األكاديم
+MPE 462 Graduation Project (2) مشروع
+( التخرج2
+--- CHUNK ID cf8abf6c-acb9-4043-9cff-1a69c36abf9a
+Electrical power | القوى الكهربية | 2
+Electrical Machines | آالالت الكهربية | 3
+Power Electronics | إلكترونيات القوي | 4
+Electrical Systems | األنظمة الكهربية | 5
+New and Renewable Energy | الطاقة الجديدة والمتجددة | 6
+Graduation Project | مشروع التخرج | 7
+في كود مقررات متطلبات التخصص العام والدقيق-
+برنامج هندسة الطاقة والنظم
+Electrical power
+إلكترونيات القوي
+األنظمة الكهربية
+Electrical Systems
+الطاقة الجديدة والمتجددة
+--- CHUNK ID f3a6c145-e4f8-4475-b3a7-6e36e59213eb
+EPE  332 Control of Electrical Machine systems
+EPE 333 Dynamic Performance of Electrical Machines
+MEP 311 Thermal power Stations
+EPE  332 Power Electronics Applications in Renewable Energy
+EPE 333 Integrating Renewable Resources with the Grid
+Four
+EPE 421 Protection of Electrical Systems
+EPE 422 Control of Electrical Power Systems
+EPE 451 Energy Storage Systems
+EPE 461 Power
+Generation from Renewable Sources
+EPE 471 Graduation Project (1)
+EPE 452 Smart Grids
+--- CHUNK ID d2921190-f4d7-4ad5-b77a-43268335fcba
+EPE 452 Smart Grids
+EPE 463 Electric and Hybrid Vehicles Technology
+EPE 464 Nuclear Power Plants
+EPE  332 Electrical Installations
+EPE 333 Automation of Electrical Distribution systems
+EPE 441 Planning of Renewable Energy Systems
+EPE 462 Distributed Generation Units
+EPE 453 Energy Efficiency
+EPE 472 Graduation Project (2)
+--- CHUNK ID 34bc8d89-a9b7-4adb-b942-8fd5bc7ad898
+مادة: Graduation Project (1)، كود المقرر: ARE481، الساعات المعتمدة: 2، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 712aa342-3e1a-44ab-a92d-3e26505d3f2f
+مادة: Graduation Project (2)، كود المقرر: ARE482، الساعات المعتمدة: 7، المتطلب السابق: ARE481.
+--- CHUNK ID 935965f1-607f-416c-a80d-e47202a9c61b
+مادة: Cxx4x1 Graduation project (A) مشروع التخرج (أ)، كود المقرر: ENGX61+
+HUMX32+
+112 Cr or
+more، الساعات المعتمدة: 1، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 9f4b35e3-f64c-4383-b7c3-794378e0217c
+مادة: Graduation Project (1) مشروع التخرج (1)، كود المقرر: EPE 461، الساعات المعتمدة: 1، المتطلب السابق: ENGX61+
+HUMX32+
+112 Cr or
+more.
+--- CHUNK ID 546871d8-3d53-4d52-8d50-7166729061b2
+مادة: Graduation Project (2) مشروع التخرج (2)، كود المقرر: EPE 462، الساعات المعتمدة: 3، المتطلب السابق: EPE 461.
+--- CHUNK ID 4766bfd6-c7fb-48bf-b58b-d69341e4ba45
+مادة: Graduation Project (1)، كود المقرر: EPE 461، الساعات المعتمدة: 1، المتطلب السابق: ENGX61+
+HUMX32+112
+Cr or more.
+--- CHUNK ID edec73b1-fbdd-4799-b57d-1bcb34bf31ee
+مادة: Graduation Project (2)، كود المقرر: EPE 462، الساعات المعتمدة: 3، المتطلب السابق: EPE 461.
+--- CHUNK ID e4fe633b-3e35-4283-9fb7-c72db2a1fa73
+مادة: Graduation Project (1)، كود المقرر: EPE 461، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 87e04373-6d5e-4dd5-bf3c-2e7520a15906
+مادة: Graduation Project (2)، كود المقرر: EPE 462، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 7be70f0f-fe0c-46ba-a861-a59e2ee7a92a
+مادة: Graduation Project (B) مشروع التخرج (ب)، كود المقرر: EEC 482، الساعات المعتمدة: 3، المتطلب السابق: EEC481.
+--- CHUNK ID 2a3fb34a-6b8d-4222-bfb4-15911cd6da6b
+مادة: Graduation Project (B)، كود المقرر: EEC 482، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 00aec908-8441-4151-8113-46425bed6bed
+مادة: Graduation Project (B)، كود المقرر: EEC 482، الساعات المعتمدة: 3، المتطلب السابق: EEC481.
+--- CHUNK ID cc124795-384a-469b-bff0-d859c57d3f9a
+مادة: Graduation project (A) مشروع التخرج (ا)، كود المقرر: CCE 461، الساعات المعتمدة: 1، المتطلب السابق: 23X
+GNE + MUH
+معتمدة + 16X
+الطالب 211ساعة
+** يجب أن يجتاز.
+--- CHUNK ID cfc84878-6ec7-4bcd-9418-92d2ca5fad47
+مادة: Graduation project (B) مشروع التخرج (ب)، كود المقرر: CCE 462، الساعات المعتمدة: 3، المتطلب السابق: CCE 461.
+--- CHUNK ID f5e0f083-ef9c-4c5d-8e20-e3bf97d99325
+مادة: Graduation Project (A)، كود المقرر: CCE 461، الساعات المعتمدة: 1، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID ab24b604-857b-4262-9cf0-bbb754bfa8ec
+مادة: Graduation Project (B)، كود المقرر: CCE 462، الساعات المعتمدة: 3، المتطلب السابق: CCE 461.
+--- CHUNK ID 2a174bc8-5644-4be5-ba66-fa79856cc9b5
+مادة: Graduation Project (A) مشروع التخرج (أ)، كود المقرر: PDE 451، الساعات المعتمدة: 1، المتطلب السابق: HUM X32,
+ENG X61,
+112 CR.
+--- CHUNK ID 014f4b79-af52-4f2c-b5b0-2ff7d1243a5c
+مادة: Graduation Project (B) مش روع التخرج (ب)، كود المقرر: PDE 452، الساعات المعتمدة: 3، المتطلب السابق: PDE 451.
+--- CHUNK ID 93492c67-7431-4b53-9dec-d72958867381
+مادة: Graduation Project (A)، كود المقرر: PDE 45A، الساعات المعتمدة: 1، المتطلب السابق: HUM X32,
+ENG X61,
+112 Cr.
+--- CHUNK ID 3e52517a-64ac-4c49-8dde-3f1e304e2915
+مادة: Graduation Project (B)، كود المقرر: PDE 45B، الساعات المعتمدة: 3، المتطلب السابق: PDE 45A.
+--- CHUNK ID 1a71cce6-7f44-41dc-882a-d9e8c5221772
+مادة: Graduation project (A) مشروع التخرج (ا)، كود المقرر: MPE 454، الساعات المعتمدة: 1، المتطلب السابق: Earn ≥ 112 Cr
+ENGX61+ HUMX32.
+--- CHUNK ID 1d8b1bc9-ff43-4b1e-837e-c764dbcb9a95
+مادة: Graduation project (B) مشروع التخرج (ب)، كود المقرر: MPE 455، الساعات المعتمدة: 3، المتطلب السابق: MPE 454.
+--- CHUNK ID cbed190e-d7f4-4344-bc04-9c802df97cd2
+مادة: Graduation project (A، كود المقرر: MPE454، الساعات المعتمدة: 1، المتطلب السابق: + 112 Cr
+ENGX61+
+HUMX32.
+--- CHUNK ID 1f3b75a8-a090-490d-b1b6-056ccacec1aa
+مادة: Graduation project (B)، كود المقرر: MPE455، الساعات المعتمدة: 3، المتطلب السابق: MPE454.
+--- CHUNK ID cdf2d145-9ed3-4ca9-99d2-7952c787942e
+مادة: Graduation Project Studies، كود المقرر: EAE481، الساعات المعتمدة: 2، المتطلب السابق: معتمدة
+ساعة 211واكمال
+163EAE 213EAE.
+--- CHUNK ID fbcd3810-30c6-4e17-a4dc-38e9b6d7d9e9
+مادة: Graduation Project، كود المقرر: EAE482، الساعات المعتمدة: 7، المتطلب السابق: EAE481.
+--- CHUNK ID eaab20bd-74cd-419e-9573-685c4cb35225
+مادة: Graduation Project (1) مشروع التخرج (1)، كود المقرر: MPE 461، الساعات المعتمدة: 3، المتطلب السابق: أالكاديم
+موافقة المرشد +
+23XMU
++ 16XGNE
++211 ساعة معتمدة.
+--- CHUNK ID 058a1a08-83d1-4e41-acd0-442ad65c3741
+مادة: Graduation Project (2) مشروع التخرج (2)، كود المقرر: MPE 462، الساعات المعتمدة: 3، المتطلب السابق: MPE 461.
+--- CHUNK ID 7e20b65b-6eaf-496a-b532-6c138cad8454
+مادة: Graduation Project (1)، كود المقرر: MPE 461، الساعات المعتمدة: 3، المتطلب السابق: ENGX61 +
+HUMX32 +112
+Cr.
+--- CHUNK ID 16987875-20ac-4f12-9695-2223f63cf575
+مادة: Graduation Project (2)، كود المقرر: MPE 462، الساعات المعتمدة: 3، المتطلب السابق: MPE 461.
+--- CHUNK ID 717ca046-b67e-4d0e-8ce6-6198b2da8f40
+مادة: Graduation Project (1) مشروع التخرج (1)، كود المقرر: EPE 471، الساعات المعتمدة: 1، المتطلب السابق: 112 Cr. H +
+ENGX61 +
+HUMX32.
+--- CHUNK ID 424d9fca-985b-48f7-bbc3-8374f02da0a5
+مادة: Graduation Project (2) مشروع التخرج (2)، كود المقرر: EPE 472، الساعات المعتمدة: 3، المتطلب السابق: EPE 471.
+--- CHUNK ID 35292f4c-c5e8-4c7e-a033-cbcb73771ae1
+مادة: Graduation Project (1)، كود المقرر: EPE 471، الساعات المعتمدة: 1، المتطلب السابق: 112 Cr. H +
+ENGX61 +
+HUMX32.
+--- CHUNK ID acabb18c-b838-49b6-a74e-44999a865310
+مادة: Graduation Project (2)، كود المقرر: EPE 472، الساعات المعتمدة: 3، المتطلب السابق: EPE 471.
+--- CHUNK ID c571deee-6687-4d80-b22e-d51f6620fd20
+مادة: Graduation Project (1)، كود المقرر: EPE 471، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID 8fcd6b61-bb90-4cca-bfa7-294fa7f8099a
+مادة: Graduation Project (2)، كود المقرر: EPE 472، الساعات المعتمدة: غير محدد، المتطلب السابق: لا يوجد متطلب سابق.
+--- CHUNK ID b4205e08-954a-491d-aa3e-808350772af4
+theaters, etc). the use of computational applications in acoustic and artificial lightning design.
+Course Title | Graduation Project (1)
+Course Content: The course aims to work on the graduation project to show the student’s ability to address and
+solve the technical and technical problems presented. The project reflects the student’s outcome of the
+knowledge and skills that he acquired during his studies in an integrated scientific manner, and that the project
+--- CHUNK ID 863c7075-8d7e-4dad-980b-fde59f0b91e6
+Course Title | Graduation Project (2)
+Core | 7 | 2 | 0 | 14 | 16
+Course Content: The student makes the architectural designs for the graduation project whose program has been
+prepared and its location in the first semester - and it is of the type of projects of a comprehensive complex nature
+to show the student’s ability to deal with it with all the backgrounds that have been acquired throughout the
+--- CHUNK ID ea64d235-9b18-4bc4-94eb-9864e5128ef0
+الأكواد الموجودة في هذه الصفحة: CWR 342, لى20, تمثل
+20, CSE 361, otal 160, عدد32
+5. | Cxx4x2 | Graduation project (B) | مشروع التخرج (ب) | 3 | Cxx4x1
+Total Credit Hours | 12
+D-15
+متطلبات التخصص الدقيق PR
+يجب على ا لطالب الذي يرغب في إكمال
+تخصص الدقيق أن يكمل الحد األدنى من المتطلبات وهي
+ساعة معتمدة إجبارية باإلضافة
+إ لى20
+إختيارية
+بإجمالي عدد32
+ساعة معتمدة تمثل
+20,00
+كما هو مبين في الجدول
+التالي ،
+وهو مطابق للحدود المقترحة من
+اإلط.ار المرجعي
+جدول( .
+- )أ
+قائمة مقررات
+تخصص اإلجبارية
+--- CHUNK ID d7147bbc-1683-44b2-8390-14063d20ab12
+الأكواد الموجودة في هذه الصفحة: HUMX32, MPEX51, ENGX61
+CVE4×1 | Graduation Project (A) | 1 | 1 | 0 | 1 | 2 | *** | -
+C××4E5 | Specialized Elective Course (5)
+Table (4-G) | 3 | 2 | 2 | 0 | 4 | Table (4-G) | 3
+C××4E6 | Specialized Elective Course (6)
+Table(4-H) | 3 | 2 | 2 | 0 | 4 | Table (4-H) | 2
+C××4E7 | Specialized Elective Course (7)
+Table (4-I) | 2 | 2 | 1 | 0 | 3 | Table (4-I) | 2
+Total | 14 | 12 | 5 | 2 | 19
+EMP×E× | Elective Course – Fac. Req.
+--- CHUNK ID adebf5a1-a428-4bef-9ea6-d25346814e33
+EMP×E× | Elective Course – Fac. Req.
+ARC4×1 | Architecture Construction | 1 | 1 | 1 | 0 | 2 | - | 3
+C××4E8 | Specialized Elective Course (8)
+Table (4-K) | 1 | 1 | 0 | 1 | 2 | Table (4-K) | 2
+MPE/EPE4
+×1 | Electrical and Mechanical
+Fittings | 1 | 1 | 1 | 0 | 2 | - | 2
+CVE4×2 | Graduation Project (B) | 3 | 2 | 0 | 2 | 4 | CVE4×1 | -
+HUM×E× | Elective Course – Un. Req.
+Table 1-B | 2 | 2 | 0 | 0 | 2 | - | 1
+Total | 13 | 11 | 5 | 3 | 19
+D-56
+MPEX51
+C××4E5
+Specialized Elective Course (5)
+Table (4-G)
+--- CHUNK ID 903bee6e-8ddb-446e-a8d9-e24725f19a41
+2 | 1 | 2 | 0 | 2 | Major Requirements
+Course Content: Construction quantities - take-off principles - methods of measurement - writing the bill -
+measuring and valuation of works during project execution - updating and reporting – Applications in
+construction projects – preparation of construction specifications.
+Course title | Graduation Project -A
+1 | 1 | 0 | 1 | 2 | Compulsory
+Course Content: The aim of the project is to provide the students, who work in groups, with an opportunity to
+--- CHUNK ID 58534f8b-f804-4490-bd2a-740ef8aaf1bb
+CSE462
+Major Requirements
+Course Content: Construction quantities - take-off principles - methods of measurement - writing the bill -
+measuring and valuation of works during project execution - updating and reporting – Applications in
+construction projects – preparation of construction specifications.
+Graduation Project -A
+C×× 4X1
+ENGX61+ HUMX32+
+112 Cr or more
++ Academic Advisor
+Approval
+--- CHUNK ID e94f9a47-5b4b-40c3-a044-7216ea08da73
+Course title | Graduation Project - B
+course code | C×× 4X2 | Prerequisite | C×× 4X1
+3 | 2 | 0 | 2 | 4 | Compulsory
+Course Content: All students undertake a major project as part of the program. The aim of the project is to
+provide the students, who work in groups, with an opportunity to implement the appropriate concepts and
+techniques to a particular design. A dissertation on the project is submitted on which the student is examined
+orally.
+D-66
+Graduation Project - B
+C×× 4X2
+C×× 4X1
+--- CHUNK ID fe1e4496-c675-4e12-b654-11308c073a18
+D-66
+Graduation Project - B
+C×× 4X2
+C×× 4X1
+Course Content: All students undertake a major project as part of the program. The aim of the project is to
+provide the students, who work in groups, with an opportunity to implement the appropriate concepts and
+techniques to a particular design. A dissertation on the project is submitted on which the student is examined
+orally.
+--- CHUNK ID d601a9d2-8ebc-4518-be44-0d5d0c36319c
+Electrical power | القوى الكهربية | 2
+Electrical Machines | آالالت الكهربية | 3
+Power Electronics | إلكترونيات القوي | 4
+Electrical Systems | األنظمة الكهربية | 5
+Graduation Project | مشروع التخرج | 6
+في كود مقررات متطلبات
+التخصص العام والدقيق-
+برنامج هندسة القوى الكهربية
+Electrical power
+إلكترونيات القوي
+األنظمة الكهربية
+Electrical Systems
+--- CHUNK ID 4616ed75-88a4-4430-9da1-900cdfe48164
+تحليل نظم
+EPE 323 High Voltage Engineering هندسة الجهد العالي
+EPE 431 Special Machines آالت خاصة
+EPE 432 Control of Electrical Machines  التحكم في اآلالت الكهربية
+EPE 421 Protection of Electrical Power Systems وقاية نظم القوي الكهربية
+EPE 422 Applications of Electrical Protection Systems
+تطبيقات نظم الوقاية
+EPE 423 Control of Electrical Power Systems
+التحكم في نظم القوى
+EPE 461 Graduation Project  (1)
+EPE 462 Graduation Project  (2)
+--- CHUNK ID 73c92e48-c4c8-495a-bcfb-85881042f44e
+الأكواد الموجودة في هذه الصفحة: EEC 481, ENG161, طالب112, EEC 417, EEC 351, EEC 437, دقيق15, EEC 446, يقية
+11, HUMX32, EEC 482, االت
+12, EEC 348, EEC 336
+الشبكات والعلوم التطبيقية
+مقرر اختياري تخصصي 1
+مقرر اختياري تخصصي 2
+F 10
+10. EEC 446
+معالجة الصور وتطبيقاتها
+الشبكات والعلوم التطبيقية
+11. EEC 351 Communication Networks
+شبكات االتصاالت
+12. EEC 481 Senior Project (A) مشروع التخرج-
+13. EEC 482 Graduation Project (B)
+*** يجب أن يجتاز الطالب112
++ساعة معتمدةENG161+HUMX32
+:ب
+--- CHUNK ID a881c2d4-4b58-4111-a24f-7b0d7c927007
+discrete event, combined, and other modeling – Techniques statistics of simulation analysis, Validation and
+Verification – Software Intensive Systems Applications – Current and future directions of simulation for a wide
+range of applications using MATLAB – High level programming language- Advanced applications.
+Senior Project (A) | Course title
+Discipline and Mandatory | 2 | 1 | 0 | 1 | 1
+Graduation Project (B) | Course title
+Discipline and Mandatory | 6 | 5 | 0 | 1 | 3
+F 51
+--- CHUNK ID 9fa3be2f-cf62-4916-8e5a-9b95fc5fb30a
+kinematics - Differential kinematics: Singularities and Jacobians - Mobile robots - Robot control -
+Motion planning - Robot operating systems (ROS).
+Graduation Project (A) | Course title
+Specialized Courses | 2 | 1 | 0 | 1 | 1
+Course Content: Topics are selected by groups of students according to their field of interest and based
+on the approval of the supervisors - Each group of students must give an oral presentation of the project
+--- CHUNK ID 5ac21802-25a0-4bf4-9606-47495fa62df1
+Graduation Project (B) | Course title
+Specialized Courses | 5 | 4 | 0 | 1 | 3
+Course Content: Selecting the suitable technique for project topic - Main professional and practical part
+- Complete data processing – Writing the project report that contains conclusion and recommendations.
+G 51
+Course Content: Selecting the suitable technique for project topic - Main professional and practical part
+- Complete data processing – Writing the project report that contains conclusion and recommendations.
+--- CHUNK ID 4ec57cc4-741b-44e6-a2bb-ab4d32aad8ab
+Repeated response –Stability of linear control systems – Engineering locus of roots.
+Course title | Graduation Project (A)
+1 | 0 | 0 | 3 | 3 | PR – Mandatory
+Different projects in one of the different fields of specifications are prepared by the department each year and
+students are distributed to choose one of these according to the regulation put by the department.
+Course title | Die Design
+Introduction – Allowances and overrides in molds – Types of molds of metal components – Components of
+--- CHUNK ID 4c4cf993-83d2-42a1-9515-a17198282e44
+Sheet – Reviewing the Data and Making a Decision.
+Course title | Graduation Project (B)
+PDE 452 | PDE 451
+3 | 1 | 1 | 3 | 5 | PR – Mandatory
+H 61
+Composite Materials and Mechanical Properties of Polymers
+PDE 121, PDE 122
+Fibers And Their Types – Composing – Fibers and Plastics – Open Sand Closed Dies Processes To Produce Plastic
+Composites – Composites With Metallic Base – Composites With Ceramic Base – Other Composites (Concrete –
+Asphalt – Wood ).
+PDE  442
+--- CHUNK ID d2443d42-4d59-4f8c-ac37-da480d87d892
+MPE424
+Automatic Control of Mechanical
+MPE442
+Technical Elective Course (1)
+Technical Elective Course (2)
+--
++ 112 Cr
+Graduation project (A
+Hydraulic and Pneumatic Circuits
+MPE425
+Turbo-machinery
+MPE426
+Technical Elective Course (3)
+Technical Elective Course (4)
+--- CHUNK ID 095ab909-36d5-48b1-ba0a-d22a284e0076
+and efficiency losses - Axial flow compressors and fans - Velocity diagrams for single-stage compressor -
+Performance characteristics of Multistage compressors - Blade element theory - Best centrifugal compressor
+design - Slip factor - compressor stage impact - Centrifugal compressors and fans - Radial flow turbines - Wind
+turbines: (types, performance, design, and control)
+Graduation project (A) | Course title
+Earn 120 Cr or more +
+ENGX61+ HUMX32 | MPE454
+Prerequisite | course code
+--- CHUNK ID b671bfcf-6ebb-422d-bc10-bc543d8c8fbd
+Graduation project (B) | Course title
+Technical Discipline - mandatory | 6 | 3 | 2 | 1 | 3
+Course Content: In the second part of the project, the student makes the necessary measurements and
+calculations – do a technical writing of the project – do an effective presentation of the project during the
+discussion
+I 59
+Hydraulic and Pneumatic Circuits
+MPE425
+Turbo-machinery
+MPE426
+Course Content: Introduction - Analysis of compressible and non-compressible fluids - Performance characteristics
+--- CHUNK ID 11c47f2f-c51b-4f38-9d70-3202911b6579
+Urban Planning(1)
+Elective Course (Major) (6)
+Occupational Health and Safety
+University Requirement (2)
+EAE312  EAE361
+Graduation Project Studies
+Planning and Developing Sustainable
+Urban Communities
+Building Information  Modeling BIM
+Elective Course (Major) (3)
+Elective Course (Major) (4)
+Elective Course (Major) (5)
+--- CHUNK ID 25d79b12-1638-4e65-8ab6-bd7a2c21bee3
+course design.
+Sanitary Fixtures: kitchenwEAE and laundries - hydraulic facilities: water and sanitation - liquid waste and rainwater -
+sanitary equipment in buildings - problems and solutions - fire resistance needs - disposal of solid waste - architectural
+Course Title | Graduation Project Thesis
+Course Content: Graduation project aims to emphasis the student’s ability to deal with and handle technical issues
+--- CHUNK ID 10da1fb8-043d-4db5-8be2-93c6cee79df4
+arose in his field. The project should cover and reflect a comprehensive compination of skills and knowledge gained by
+the student during his study in the program and it should be authentic and novel. Also, it should contain all the
+nessecary analatical studies. The student should submit a detailed report about his studies and criteria on which he will
+design the project according to the traditions of architectural practice.
+Course Title | Graduation Project
+Core | 7 | 2 | 0 | 10 | 12
+--- CHUNK ID 193d92cd-d7fe-4f35-b55b-cbff8966e07e
+course design.
+Sanitary Fixtures: kitchenwEAE and laundries - hydraulic facilities: water and sanitation - liquid waste and rainwater -
+sanitary equipment in buildings - problems and solutions - fire resistance needs - disposal of solid waste - architectural
+Graduation Project Thesis
+EAE103
+EAE312 EAE362
+Course Content: Graduation project aims to emphasis the student’s ability to deal with and handle technical issues
+--- CHUNK ID e3ddddef-161c-40ab-ac4f-5a7acc9a4e0e
+Thermodynamics | الهندسة الحاررية | 2
+Fluid Mechanics | ميكانيكا الموائع | 3
+Combustion Systems | أنظمة ا لحتارق | 4
+Automatic Control | التحكم آاللي | 5
+Graduation Project | مشروع التخرج | 6
+L 7
+فى كود مقررات متطلبات
+التخصص العام والدقيق-
+هندسة الميكاترونيا
+الهندسة الحرارية
+أنظمة االحتراق
+Combustion Systems
+التحكم اآللي
+Automatic Control
+--- CHUNK ID 04f62f38-953a-4fc4-bd61-6d2849c08c73
+MPE 354 Robotics روبوتات
+Digital Control Systems نظم التحكم الرقمي
+Object Oriented
+Programming and Data
+البرمجة الشيئية وهياكل
+البيانات
+Digital Signal Processing معالجة اإلشارة الرقمية
+MPE 441 Automotive Engineering هندسة السيارات
+MPE 451 Industrial Process Control
+التحكم في العمليات
+Advanced Robotics روبوتات متقدمة
+Numerical Control
+Machines CNC
+ماكينات التشغيل بالتحكم
+العددي
+Embedded Systems  األنظمة المدمجة
+MPE 461 Graduation Project (1) مشروع
+( التخرج1
+UMX32
++ موافقة المرشد
+األكاديم
+--- CHUNK ID 43c6e2fc-c8e8-4dca-b24b-c145e077f141
+( التخرج1
+UMX32
++ موافقة المرشد
+األكاديم
+MPE 462 Graduation Project (2) مشروع
+( التخرج2
+--- CHUNK ID 8795b0cb-c1f8-444c-910d-a40dac09b9db
+Electrical power | القوى الكهربية | 2
+Electrical Machines | آالالت الكهربية | 3
+Power Electronics | إلكترونيات القوي | 4
+Electrical Systems | األنظمة الكهربية | 5
+New and Renewable Energy | الطاقة الجديدة والمتجددة | 6
+Graduation Project | مشروع التخرج | 7
+في كود مقررات متطلبات التخصص العام والدقيق-
+برنامج هندسة الطاقة والنظم
+Electrical power
+إلكترونيات القوي
+األنظمة الكهربية
+Electrical Systems
+الطاقة الجديدة والمتجددة
+--- CHUNK ID 58c1dd14-325e-4ff0-8cbc-3449adcd03f6
+EPE  332 Control of Electrical Machine systems
+EPE 333 Dynamic Performance of Electrical Machines
+MEP 311 Thermal power Stations
+EPE  332 Power Electronics Applications in Renewable Energy
+EPE 333 Integrating Renewable Resources with the Grid
+Four
+EPE 421 Protection of Electrical Systems
+EPE 422 Control of Electrical Power Systems
+EPE 451 Energy Storage Systems
+EPE 461 Power
+Generation from Renewable Sources
+EPE 471 Graduation Project (1)
+EPE 452 Smart Grids
+--- CHUNK ID 40e4ca40-3657-45e9-af1d-57e56cc8420b
+EPE 452 Smart Grids
+EPE 463 Electric and Hybrid Vehicles Technology
+EPE 464 Nuclear Power Plants
+EPE  332 Electrical Installations
+EPE 333 Automation of Electrical Distribution systems
+EPE 441 Planning of Renewable Energy Systems
+EPE 462 Distributed Generation Units
+EPE 453 Energy Efficiency
+EPE 472 Graduation Project (2)

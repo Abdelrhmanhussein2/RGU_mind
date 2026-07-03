@@ -6,6 +6,9 @@ from schemes.retreival_schemes import retrievalRequest, retrievalResponse, augme
 
 class answer_controller:
     def answer(self,request:retrievalRequest, db:Session):
+        translated_query = llm_service.translate_query(request.query)
+        request.query = translated_query
+        
         response=retrievall_controller.retrieval_controller(request, db)
 
         print("\n\n====== DEBUG: RETRIEVED CHUNKS FROM QDRANT ======")
@@ -19,7 +22,7 @@ class answer_controller:
         print("=================================================\n\n")
 
         chunks_for_llm = [f"[رقم الشانك: {source.chunk_id}]\n{source.chunk_text}" for source in response]
-        answer=llm_service.generate_answer(request.query, chunks_for_llm)
+        answer = llm_service.generate_answer(request.query, chunks_for_llm, department_id=request.department_id)
         
         return augmentedResponse(
             answer=answer,

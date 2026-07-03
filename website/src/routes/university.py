@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, BackgroundTasks, UploadFile, Form, File
+from fastapi import APIRouter, Depends, BackgroundTasks, UploadFile, Form, File, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from helpers.config import get_db, SessionLocal
-from helpers.security import get_current_university
+from helpers.security import get_current_university, verify_password
 from models.university_model import University
 from models.faculty_model import Faculty
 from models.department_model import Department
@@ -117,3 +118,57 @@ async def get_regulations(
         })
         
     return submissions
+
+@university_router.delete("/reset-regulation")
+async def reset_regulation(
+    faculty_name: str,
+    department_name: str,
+    university: University = Depends(get_current_university),
+    db: Session = Depends(get_db)
+):
+    faculty = db.query(Faculty).filter(
+        Faculty.university_id == university.id,
+        Faculty.name.ilike(faculty_name)
+    ).first()
+    
+    if not faculty:
+        raise HTTPException(status_code=404, detail="Faculty not found")
+        
+    department = db.query(Department).filter(
+        Department.faculty_id == faculty.id,
+        Department.name.ilike(department_name)
+    ).first()
+    
+    if not department:
+        raise HTTPException(status_code=404, detail="Department not found")
+        
+    return await data_controller.reset_content(department.id, db)
+
+class UpdateProfileRequest(BaseModel):
+    name: str
+    contact_email: str
+    password: str
+
+@university_router.put("/profile")
+async def update_profile(
+    req: UpdateProfileRequest,
+    university: University = Depends(get_current_university),
+    db: Session = Depends(get_db)
+):
+    if not verify_password(req.password, university.password):
+        raise HTTPException(status_code=403, detail="Incorrect password")
+    
+    university.name = req.name
+    university.contact_email = req.contact_email
+    db.commit()
+    db.refresh(university)
+    
+    return {
+        "message": "Profile updated successfully",
+        "user": {
+            "id": str(university.id),
+            "name": university.name,
+            "email": university.contact_email,
+            "role": "university"
+        }
+    }

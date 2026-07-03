@@ -142,3 +142,20 @@ export function getMe(): AuthUser | null {
     return null;
   }
 }
+
+export async function updateUniversityProfile(name: string, contactEmail: string, password: string): Promise<AuthUser> {
+  const response = await api.put("/university/profile", {
+    name,
+    contact_email: contactEmail,
+    password
+  });
+  
+  const user = getMe();
+  if (user) {
+    user.name = name;
+    user.email = contactEmail;
+    localStorage.setItem("user", JSON.stringify(user));
+  }
+  return response.data.user;
+}
+

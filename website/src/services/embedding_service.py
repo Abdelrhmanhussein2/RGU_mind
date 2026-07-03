@@ -100,17 +100,23 @@ class EmbeddingService:
         if not document_ids:
             return
             
-        self.qdrant.delete(
-            collection_name=self.collection_name,
-            points_selector=Filter(
-                must=[
-                    FieldCondition(
-                        key="document_id",
-                        match=MatchAny(any=[str(doc_id) for doc_id in document_ids])
-                    )
-                ]
+        self._ensure_collection_exists()
+        
+        try:
+            self.qdrant.delete(
+                collection_name=self.collection_name,
+                points_selector=Filter(
+                    must=[
+                        FieldCondition(
+                            key="document_id",
+                            match=MatchAny(any=[str(doc_id) for doc_id in document_ids])
+                        )
+                    ]
+                )
             )
-        )
+        except Exception as e:
+            if "doesn't exist" not in str(e):
+                raise e
 
     def search(self, query: str, top_k: int, department_id: UUID):
         response = self.co.embed(

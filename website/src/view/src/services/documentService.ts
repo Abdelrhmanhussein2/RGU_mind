@@ -66,3 +66,14 @@ export async function deleteDocument(id: string): Promise<void> {
   void api; // will be: await api.delete(`/documents/${id}`)
   return new Promise((resolve) => setTimeout(resolve, 300));
 }
+
+// 🔌 BACKEND: DELETE /university/reset-regulation
+export async function resetRegulation(facultyName: string, departmentName: string): Promise<void> {
+  const response = await api.delete("/university/reset-regulation", {
+    params: {
+      faculty_name: facultyName,
+      department_name: departmentName
+    }
+  });
+  return response.data;
+}
