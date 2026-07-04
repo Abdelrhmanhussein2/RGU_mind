@@ -5,6 +5,7 @@ import { UniversityDashboard } from "./pages/UniversityDashboard";
 import { StudentChat } from "./pages/StudentChat";
 import { StudentAcademicProfile } from "./pages/StudentAcademicProfile";
 import { NotificationsPage } from "./pages/NotificationsPage";
+import { StudentStudyPlanner } from "./pages/StudentStudyPlanner";
 import { AdminDashboard } from "./pages/AdminDashboard";
 
 // Student Authentication Pages
@@ -47,6 +48,12 @@ const studentNotifications = createElement(
   ProtectedRoute,
   { requiredRole: "student" },
   createElement(NotificationsPage)
+);
+
+const studentStudyPlanner = createElement(
+  ProtectedRoute,
+  { requiredRole: "student" },
+  createElement(StudentStudyPlanner)
 );
 
 const universityDashboard = createElement(
@@ -105,6 +112,10 @@ export const router = createBrowserRouter([
   {
     path: "/student/notifications",
     element: studentNotifications,
+  },
+  {
+    path: "/student/study-planner",
+    element: studentStudyPlanner,
   },
 
   // University Auth Routes (public)

@@ -14,6 +14,7 @@ import {
   Sparkles,
   GraduationCap,
   Bell,
+  CalendarClock,
 } from "lucide-react";
 import { sendMessage, getChatHistory } from "../../services/chatService";
 import { logout } from "../../services/authService";
@@ -210,6 +211,13 @@ export function StudentChat() {
           >
             <Bell className="w-5 h-5" />
             <span className="text-sm font-medium">Notifications</span>
+          </button>
+          <button
+            onClick={() => navigate("/student/study-planner")}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
+          >
+            <CalendarClock className="w-5 h-5" />
+            <span className="text-sm font-medium">Study Planner</span>
           </button>
           <button
             onClick={handleLogout}
