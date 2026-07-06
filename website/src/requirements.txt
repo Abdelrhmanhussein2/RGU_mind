@@ -16,3 +16,4 @@ cohere
 qdrant-client
 redis
 groq
+arabic-reshaper

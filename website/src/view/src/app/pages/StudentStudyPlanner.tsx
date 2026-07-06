@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ArrowLeft, Plus, Trash2, Loader2, Clock, BookOpen, Coffee } from "lucide-react";
+import { Sidebar } from "../components/Sidebar";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -13,7 +14,8 @@ import {
   StudyPlannerRequest,
   StudyPlannerResponse,
   generateDailyStudyPlan,
-} from "../lib/studyPlanner";
+} from "../../lib/studyPlanner";
+
 
 interface Subject {
   id: string;
@@ -149,21 +151,23 @@ export function StudentStudyPlanner() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
-        <button
-          onClick={() => navigate("/student/chat")}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Back</span>
-        </button>
-        <div className="h-4 w-px bg-gray-300" />
-        <h1 className="text-lg font-semibold text-gray-900">Daily Study Planner</h1>
-      </div>
+    <div className="min-h-screen bg-gray-50 flex">
+      <Sidebar />
+      <div className="flex-1 min-w-0 overflow-y-auto">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
+          <button
+            onClick={() => navigate("/student/chat")}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+          <div className="h-4 w-px bg-gray-300" />
+          <h1 className="text-lg font-semibold text-gray-900">Daily Study Planner</h1>
+        </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+        <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
         {/* Input card */}
         <Card>
           <CardHeader>
@@ -325,6 +329,7 @@ export function StudentStudyPlanner() {
             </Card>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
+import { Sidebar } from "../components/Sidebar";
 import { ArrowLeft, Bell, BellOff, Check } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Button } from "../components/ui/button";
@@ -70,8 +71,10 @@ export function NotificationsPage() {
         : "No notifications yet";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-gray-50 flex">
+      <Sidebar />
+      <div className="flex-1 min-w-0 overflow-y-auto">
+        <header className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate("/student/chat")} className="text-gray-500 hover:text-gray-900">
@@ -110,6 +113,7 @@ export function NotificationsPage() {
           )}
         </div>
       </main>
+      </div>
     </div>
   );
 }

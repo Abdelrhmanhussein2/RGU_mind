@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
+import { Sidebar } from "../components/Sidebar";
 import {
   Brain,
   Send,
@@ -45,7 +46,12 @@ interface Chat {
 
 export function StudentChat() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout: authLogout } = useAuth();
+  
+  const searchParams = new URLSearchParams(location.search);
+  const sessionId = searchParams.get("id");
+
   const [chats, setChats] = useState<Chat[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -72,10 +78,20 @@ export function StudentChat() {
   };
 
   useEffect(() => {
-    // 🔌 BACKEND: replace mock with real getChatHistory call
-    getChatHistory().then(setChats);
     fetchNotifications();
   }, []);
+
+  useEffect(() => {
+    if (sessionId) {
+      import("../../services/chatService").then(({ getChatMessages }) => {
+        getChatMessages(sessionId).then((msgs) => {
+          if (msgs) setMessages(msgs);
+        });
+      });
+    } else {
+      setMessages([]);
+    }
+  }, [sessionId]);
 
   const handleNotificationClick = async (id: string) => {
     try {
@@ -95,21 +111,22 @@ export function StudentChat() {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!input.trim()) return;
+  const handleSendMessage = async (textToSend?: string) => {
+    const text = textToSend || input;
+    if (!text.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
+      content: text,
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    if (!textToSend) setInput("");
     setIsLoading(true);
 
     try {
-      const { answer, sources } = await sendMessage(userMessage.content);
+      const { answer, sources, sessionId: newSessionId } = await sendMessage(userMessage.content, sessionId || undefined);
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -117,6 +134,10 @@ export function StudentChat() {
         sources,
       };
       setMessages((prev) => [...prev, aiMessage]);
+      
+      if (!sessionId && newSessionId) {
+        navigate(`/student/chat?id=${newSessionId}`);
+      }
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || "Sorry, something went wrong. Please try again.";
       const errorMessage: Message = {
@@ -128,6 +149,17 @@ export function StudentChat() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const parseMessageContent = (content: string) => {
+    const options: string[] = [];
+    // Only match square brackets that contain at least one letter (to avoid [1] citations)
+    const cleanContent = content.replace(/\[([^\]]*[a-zA-Z\u0600-\u06FF]+[^\]]*)\]/g, (match, p1) => {
+      options.push(p1.trim());
+      return "";
+    }).trim();
+    
+    return { cleanContent, options };
   };
 
   const handleExampleClick = (question: string) => {
@@ -147,87 +179,7 @@ export function StudentChat() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Brain className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-gray-900">ReguMind</span>
-          </div>
-
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md">
-            <Plus className="w-5 h-5" />
-            <span className="font-medium">New Chat</span>
-          </button>
-        </div>
-
-        {/* Chat History */}
-        <div className="flex-1 overflow-auto p-3">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
-            Recent Chats
-          </div>
-          <div className="space-y-1">
-            {chats.map((chat) => (
-              <button
-                key={chat.id}
-                className="w-full flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-left transition-colors group"
-              >
-                <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900 truncate font-medium">{chat.title}</p>
-                  <p className="text-xs text-gray-500">{chat.timestamp}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* User Section */}
-        <div className="border-t border-gray-200 p-3 space-y-1">
-          <button
-            onClick={() => navigate("/")}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
-          >
-            <Home className="w-5 h-5" />
-            <span className="text-sm font-medium">Home</span>
-          </button>
-          <button 
-            onClick={() => navigate("/student/academic-profile?tab=info")}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
-            <User className="w-5 h-5" />
-            <span className="text-sm font-medium">Profile</span>
-          </button>
-          <button
-            onClick={() => navigate("/student/academic-profile")}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
-          >
-            <GraduationCap className="w-5 h-5" />
-            <span className="text-sm font-medium">Academic Profile</span>
-          </button>
-          <button
-            onClick={() => navigate("/student/notifications")}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="text-sm font-medium">Notifications</span>
-          </button>
-          <button
-            onClick={() => navigate("/student/study-planner")}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
-          >
-            <CalendarClock className="w-5 h-5" />
-            <span className="text-sm font-medium">Study Planner</span>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="text-sm font-medium">Logout</span>
-          </button>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main Chat Area */}
       <main className="flex-1 flex flex-col">
@@ -351,33 +303,58 @@ export function StudentChat() {
                           : "bg-white border border-gray-200"
                       }`}
                     >
-                      <div 
-                        dir={isArabic(message.content) ? "rtl" : "ltr"}
-                        className={`leading-relaxed ${
-                        message.role === "user" ? "text-white" : "text-gray-900"
-                      }`}>
-                        {message.role === "user" ? (
-                          <p className="whitespace-pre-line">{message.content}</p>
-                        ) : (
-                          <ReactMarkdown
-                            components={{
-                              p: ({ node, ...props }) => <p className="mb-2 last:mb-0 text-start" {...props} />,
-                              ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 text-start" {...props} />,
-                              ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-2 text-start" {...props} />,
-                              li: ({ node, ...props }) => <li className="mb-1" {...props} />,
-                              h1: ({ node, ...props }) => <h1 className="text-xl font-bold mb-2 text-start" {...props} />,
-                              h2: ({ node, ...props }) => <h2 className="text-lg font-bold mb-2 text-start" {...props} />,
-                              h3: ({ node, ...props }) => <h3 className="text-md font-bold mb-2 text-start" {...props} />,
-                              strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
-                              table: ({ node, ...props }) => <div className="overflow-x-auto mb-2"><table className="min-w-full divide-y divide-gray-200 border text-start" {...props} /></div>,
-                              th: ({ node, ...props }) => <th className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider text-start border-b" {...props} />,
-                              td: ({ node, ...props }) => <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 border-b text-start" {...props} />,
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
-                        )}
-                      </div>
+                      {(() => {
+                        const { cleanContent, options } = message.role === "assistant" 
+                          ? parseMessageContent(message.content) 
+                          : { cleanContent: message.content, options: [] };
+
+                        return (
+                          <>
+                            <div 
+                              dir={isArabic(cleanContent) ? "rtl" : "ltr"}
+                              className={`leading-relaxed ${
+                              message.role === "user" ? "text-white" : "text-gray-900"
+                            }`}>
+                              {message.role === "user" ? (
+                                <p className="whitespace-pre-line">{cleanContent}</p>
+                              ) : (
+                                <ReactMarkdown
+                                  components={{
+                                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0 text-start" {...props} />,
+                                    ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 text-start" {...props} />,
+                                    ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-2 text-start" {...props} />,
+                                    li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                    h1: ({ node, ...props }) => <h1 className="text-xl font-bold mb-2 text-start" {...props} />,
+                                    h2: ({ node, ...props }) => <h2 className="text-lg font-bold mb-2 text-start" {...props} />,
+                                    h3: ({ node, ...props }) => <h3 className="text-md font-bold mb-2 text-start" {...props} />,
+                                    strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+                                    table: ({ node, ...props }) => <div className="overflow-x-auto mb-2"><table className="min-w-full divide-y divide-gray-200 border text-start" {...props} /></div>,
+                                    th: ({ node, ...props }) => <th className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider text-start border-b" {...props} />,
+                                    td: ({ node, ...props }) => <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 border-b text-start" {...props} />,
+                                  }}
+                                >
+                                  {cleanContent}
+                                </ReactMarkdown>
+                              )}
+                            </div>
+                            
+                            {options.length > 0 && (
+                              <div className="mt-4 flex flex-wrap gap-2" dir={isArabic(options[0]) ? "rtl" : "ltr"}>
+                                {options.map((opt, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => handleSendMessage(opt)}
+                                    disabled={isLoading}
+                                    className="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 border border-indigo-200 rounded-full text-sm font-medium transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {opt}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
 
                       {message.role === "assistant" && (
                         <div className="mt-4 flex items-center gap-3">

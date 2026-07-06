@@ -15,6 +15,7 @@ from models.course_model import Course
 from models.result_image_model import ResultImage
 from models.notification_model import NotificationItem
 from models.academic_plan_model import AcademicPlan
+from models.chat_model import ChatSession, ChatMessage
 
 __all__ = [
     "University",
@@ -30,4 +31,7 @@ __all__ = [
     "Course",
     "ResultImage",
     "NotificationItem",
+    "AcademicPlan",
+    "ChatSession",
+    "ChatMessage",
 ]

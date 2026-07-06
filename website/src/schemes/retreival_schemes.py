@@ -6,6 +6,7 @@ class retrievalRequest(BaseModel):
     query: str
     Top_k:int=5
     department_id: Optional[UUID] = None
+    session_id: Optional[str] = None
 
 
 class retrievalResponse(BaseModel):
@@ -22,6 +23,7 @@ class retrievalListResponse(BaseModel):
 class augmentedResponse(BaseModel):
     answer: str
     sources: list[retrievalResponse]
+    session_id: Optional[str] = None
 
 class augmentedListResponse(BaseModel):
     message: str

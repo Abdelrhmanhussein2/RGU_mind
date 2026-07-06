@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
+import { Sidebar } from "../components/Sidebar";
 import api from "../../services/api";
 import {
   ArrowLeft,
@@ -1193,18 +1194,20 @@ export function StudentAcademicProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-3">
-          <button onClick={() => navigate("/student/chat")} className="text-gray-500 hover:text-gray-900">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <GraduationCap className="w-6 h-6 text-indigo-600" />
-          <h1 className="text-xl font-semibold text-gray-900">Academic Profile</h1>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50 flex">
+      <Sidebar />
+      <div className="flex-1 min-w-0 overflow-y-auto">
+        <header className="bg-white border-b border-gray-200">
+          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-3">
+            <button onClick={() => navigate("/student/chat")} className="text-gray-500 hover:text-gray-900">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <GraduationCap className="w-6 h-6 text-indigo-600" />
+            <h1 className="text-xl font-semibold text-gray-900">Academic Profile</h1>
+          </div>
+        </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
+        <main className="max-w-5xl mx-auto px-6 py-8">
         <Tabs defaultValue={new URLSearchParams(window.location.search).get("tab") || "overview"}>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -1250,6 +1253,7 @@ export function StudentAcademicProfile() {
         eligibility={eligibility}
         profile={profile}
       />
+      </div>
     </div>
   );
 }

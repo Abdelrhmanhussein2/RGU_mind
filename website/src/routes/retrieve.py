@@ -51,7 +51,7 @@ def answer_router(request:retrievalRequest, db:Session=Depends(get_db), current_
         else:
             raise HTTPException(status_code=400, detail="department_id is required for non-student users.")
 
-    response = answer_controllerr.answer(request,db)
+    response = answer_controllerr.answer(request,db, current_user)
     return JSONResponse(
                status_code=status.HTTP_200_OK,
                content={"data": jsonable_encoder(response), "message": "Success"}

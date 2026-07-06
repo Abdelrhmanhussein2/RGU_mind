@@ -1,9 +1,10 @@
 from cohere import Client
-from helpers.config import COHERE_API_KEY
-from helpers.config import GROQ_API_KEY
+from helpers.config import COHERE_API_KEY, GROQ_API_KEY, GEMINI_API_KEY
 import groq
 import re
 from uuid import UUID
+from google import genai
+from google.genai import types
 
 class LLMService:
     def __init__(self):
@@ -11,18 +12,70 @@ class LLMService:
         # Generic Code Pattern
         self.code_pattern = re.compile(r'(?:[A-Za-z]{2,4}|[أ-ي]{2,4})\s*\d{2,4}')
 
-    def translate_query(self, query: str) -> str:
-        system_prompt = "You are a precise academic translator. Your ONLY task is to translate the user's academic query into Arabic. If the query is already in Arabic, return it EXACTLY as is. DO NOT add any explanations, introductory text, or quotes. Output ONLY the translated Arabic query."
-        
-        response = self.groq.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": query}
-            ],
-            temperature=0.0
-        )
-        return response.choices[0].message.content.strip()
+    def _call_llm(self, system_prompt: str, user_prompt: str, temperature: float = 0.0, history: list = None) -> str:
+        try:
+
+            client = genai.Client(api_key=GEMINI_API_KEY)
+            
+            config_kwargs = {"temperature": temperature}
+            if system_prompt:
+                config_kwargs["system_instruction"] = system_prompt
+                
+            contents = []
+            if history:
+                for msg in history:
+                    role = msg["role"]
+                    content_text = msg["content"]
+                    try:
+                        part = types.Part(text=content_text)
+                    except Exception:
+                        part = types.Part.from_text(text=content_text)
+                    contents.append(types.Content(role=role, parts=[part]))
+            try:
+                user_part = types.Part(text=user_prompt)
+            except Exception:
+                user_part = types.Part.from_text(text=user_prompt)
+            contents.append(types.Content(role="user", parts=[user_part]))
+
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=contents,
+                config=types.GenerateContentConfig(**config_kwargs)
+            )
+            
+            text = response.text
+            if text:
+                return text.strip()
+            raise ValueError("Empty response from Gemini")
+        except Exception as e:
+            import sys
+            print(f"Gemini API call failed, falling back to Groq: {str(e)}", file=sys.stderr)
+            
+            # Groq Fallback
+            messages = [{"role": "system", "content": system_prompt}]
+            if history:
+                messages.extend(history)
+            messages.append({"role": "user", "content": user_prompt})
+
+            response = self.groq.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=messages,
+                temperature=temperature
+            )
+            return response.choices[0].message.content.strip()
+
+    def formulate_search_query(self, query: str, history: list = None) -> str:
+        history_context = ""
+        if history:
+            history_context = "سياق المحادثة السابقة:\n" + "\n".join([f"{msg['role']}: {msg['content']}" for msg in history[-3:]]) + "\n\n"
+            
+        system_prompt = f"""أنت خبير في صياغة جمل البحث (Search Queries).
+مهمتك استخراج الكلمات المفتاحية الأكاديمية (مثل: المستوى الصفري، متطلبات الجامعة، فصل الخريف، اسم المادة، الكود) من سؤال الطالب الحالي، مع مراعاة سياق المحادثة السابقة إذا كان السؤال يعتمد عليه (مثلاً إذا قال "الخريف" وكان السياق عن "المستوى الصفري"، يجب أن تكون جملة البحث "المستوى الصفري فصل الخريف").
+
+{history_context}
+إذا كان السؤال يحتوي على مصطلحات عامية (مثل "انا دلوقتي مستوي صفري اي المواد اللي المفروض اسجلها") حولها إلى مصطلحات بحث أكاديمية دقيقة.
+حافظ على الأرقام والأكواد كما هي. النتيجة يجب أن تكون جملة البحث فقط بدون أي إضافات."""
+        return self._call_llm(system_prompt=system_prompt, user_prompt=query, temperature=0.0)
 
     def clean_chunk(self, text: str) -> str:
         text = re.sub(r'<br>', ' ', text)
@@ -80,18 +133,16 @@ class LLMService:
                         if name_match:
                             name = name_match.group(1).strip()
                             if name and "Prerequisite" not in name and len(name) > 2:
-                                found_prereqs.append(f"| **{code}** | {name} |")
+                                found_prereqs.append(f"- **{code}**: {name}")
                                 name_found = True
                                 break
 
         if found_prereqs:
-            table = (
-                "\n\n### 📚 تفاصيل المتطلبات السابقة\n"
-                "| الكود | اسم المادة |\n"
-                "| :--- | :--- |\n"
+            list_text = (
+                "\n\n📚 **تفاصيل المتطلبات السابقة:**\n"
                 + "\n".join(found_prereqs)
             )
-            return response_text + table
+            return response_text + list_text
 
         return response_text
 
@@ -100,8 +151,9 @@ class LLMService:
             return True
         general_keywords = [
             "أفضل", "افضل", "أنسب", "انسب", "ماذا أسجل", "ماذا اسجل",
-            "أختار", "اختار", "أقترح", "اقترح", "أي مواد", "اي مواد",
-            "best", "recommend", "suggest", "which courses"
+            "أختار", "اختار", "أقترح", "اقترح", "أي مواد", "اي مواد", "أي مقررات", "اي مقررات",
+            "best", "recommend", "suggest", "which courses", "مقررات", "مواد", "courses", "subjects",
+            "كل", "جميع", "قائمة", "لستة"
         ]
         q_lower = question.lower()
         for kw in general_keywords:
@@ -113,7 +165,7 @@ class LLMService:
                 return True
         return False
 
-    def generate_answer(self, query: str, context_chunks: list[str], department_id: UUID = None):
+    def generate_answer(self, query: str, context_chunks: list[str], department_id: UUID = None, history: list = None):
         if not context_chunks:
             return "عذراً، هذه المعلومة غير متوفرة في اللائحة المتاحة."
 
@@ -128,64 +180,60 @@ class LLMService:
 
 ⚠️ **قواعد صارمة لمنع الهلوسة:**
 1. ابدأ دائماً ردك بالسلام والترحيب (مثلاً: "أهلاً بك عزيزي الطالب، ...").
-2. **دقة المتطلبات:** لا تذكر أي كود كمتطلب سابق إلا إذا ذُكر صراحةً في النص على أنه متطلب لهذه المادة تحديداً.
-3. **الساعات المعتمدة:** اذكر الرقم الموجود في النص فقط، لا تخترع أرقاماً.
-4. **اذكر الأكواد كما هي** في خانة المتطلبات، سيتم إضافة الأسماء تلقائياً.
-5. لا تستخدم معلومات من خارج السياق المرفق.
-6. إذا لم تجد المادة في السياق، أجب بـ "عذراً، هذه المعلومة غير متوفرة في اللائحة المتاحة".
+2. **الاستفسار والخيارات:** إذا كان السؤال غير واضح أو يحتمل أكثر من إجابة، اطرح سؤالاً توضيحياً وضع الخيارات في النهاية بين أقواس مربعة (مثال: [خيار 1] [خيار 2]) لتتحول إلى أزرار.
+3. **دقة المتطلبات:** لا تذكر أي كود كمتطلب سابق إلا إذا ذُكر صراحةً في النص على أنه متطلب لهذه المادة تحديداً.
+4. **الساعات المعتمدة:** اذكر الرقم الموجود في النص فقط، لا تخترع أرقاماً.
+5. **اذكر الأكواد كما هي** في خانة المتطلبات، سيتم إضافة الأسماء تلقائياً.
+6. لا تستخدم معلومات من خارج السياق المرفق.
+7. إذا لم تجد المادة في السياق، أجب بـ "عذراً، هذه المعلومة غير متوفرة في اللائحة المتاحة".
 
-التنسيق المطلوب:
+التنسيق المطلوب للرد (اجعله طبيعياً وبسيطاً):
 [أضف الترحيب هنا في السطر الأول]
-# 🎓 تقرير مقرر: [اسم المادة]
----
-### 📋 البيانات الأساسية
-| المعلومة | التفاصيل |
-| :--- | :--- |
-| **الكود** | [Course Code] |
-| **المستوى الدراسي** | [استخرجه من النص، أو: غير محدد] |
-| **الساعات المعتمدة** | [عدد من النص] ساعات |
-| **المتطلبات السابقة** | [الأكواد المذكورة صراحةً كمتطلب، أو: لا يوجد متطلب سابق] |
 
-### 🔬 المحتوى الدراسي (Course Syllabus)
-[نقاط واضحة من السياق فقط إذا توفرت]
+إليك تفاصيل مادة **[اسم المادة]**:
+🔹 **الكود:** [Course Code]
+🔹 **المستوى الدراسي:** [استخرجه من النص، أو: غير محدد]
+🔹 **الساعات المعتمدة:** [عدد من النص] ساعات
+🔹 **المتطلبات السابقة:** [الأكواد المذكورة صراحةً كمتطلب، أو: لا يوجد متطلب سابق]
 
-### 💡 ملاحظات
-[أي ملاحظات من السياق تخص المادة]
+[إذا توفر محتوى دراسي، أضفه هنا كقائمة نقطية تحت عنوان: 📚 **المحتوى الدراسي**]
+
+[إذا توفرت ملاحظات هامة، أضفها هنا تحت عنوان: 💡 **ملاحظات هامة**]
 
 CONTEXT:
 {context}
 """
         else:
-            system_prompt = f"""أنت مستشار أكاديمي خبير في اللوائح الجامعية.
-أجب على السؤال بشكل مباشر ومختصر وواضح بالعربية، بناءً على السياق المرفق فقط.
+            system_prompt = f"""أنت مستشار أكاديمي خبير في اللوائح الجامعية. 
+مهمتك هي مساعدة الطالب بناءً على السياق المرفق فقط.
 
-⚠️ **قواعد:**
+⚠️ **قواعد هامة جداً (يجب الالتزام بها حرفياً):**
 1. ابدأ دائماً ردك بالسلام والترحيب بطريقة ودودة (مثلاً: "أهلاً بك عزيزي الطالب، ...").
-2. إذا لم تجد الإجابة الدقيقة في النص المرفق، لا تكتفِ بالاعتذار، بل قدم أقرب معلومة مفيدة متعلقة بسؤال الطالب من السياق. وإذا لم يوجد أي شيء مفيد إطلاقاً، أجب بـ "عذراً، هذه المعلومة غير متوفرة".
-3. أجب على السؤال بإجابة قصيرة ومباشرة، ولا تضف تفاصيل معقدة إلا إذا سأل عنها الطالب صراحةً.
-4. اذكر المواد المناسبة مع كودها واسمها إذا سألك عن ترشيحات بناءً على السياق.
-5. 🚫 تحذير هام لمنع الهلوسة: لا تفترض أن المواد المذكورة في السياق تتطابق مع طلب الطالب إلا إذا كان السياق ينص على ذلك صراحة. (مثلاً: إذا سأل الطالب عن "المواد الاختيارية" وكان السياق يحتوي على "مواد إجبارية"، لا تقم أبداً بسرد المواد الإجبارية على أنها اختيارية! بل قل له أن السياق يوضح المواد الإجبارية ولم يذكر الاختيارية).
-6. لا تخترع معلومات من خارج السياق ولا تكرر نفس الجملة.
-7. قم بتصحيح أي أخطاء إملائية ناتجة عن استخراج النصوص (مثل كلمة "الطالءات" اجعلها "الطلاءات") لتكون الإجابة سليمة لغوياً.
+2. **الاستفسار عند الغموض الشديد فقط:** إذا كان سؤال الطالب ناقصاً جداً ويستحيل الإجابة عليه (مثلاً: يسأل عن "المستوى الصفري" ولم يحدد خريف أم ربيع)، توقف واطرح سؤالاً توضيحياً وضع الخيارات بين أقواس مربعة (مثال: [فصل الخريف] [فصل الربيع]).
+3. **لا تسأل إذا كان السؤال شاملاً:** إذا سأل الطالب عن "كل المقررات" أو "لكل سنة"، أجب إجابة كاملة شاملة، **ويُمنع منعاً باتاً أن تسأله أي سؤال توضيحي في النهاية أو تضع خيارات.**
+4. أجب بشكل مباشر ومختصر فقط إذا كان السؤال واضحاً ومحدداً.
+5. 🚫 تحذير هام لمنع الهلوسة (CRITICAL): في المستندات، جداول الخريف والربيع تأتي متتالية وقد تتداخل النصوص. يجب أن تفرق بينها بعناية بالغة. توقف فوراً عن سرد المواد بمجرد الشك في أنك دخلت في مواد الفصل الآخر، أو بمجرد ظهور مواد تحمل رقم (2) إذا كنت تسرد مواد الخريف. لا تدمج أبداً مواد الفصلين معاً.
+6. 🚫 **ممنوع كتابة أي كود مقرر نهائياً** (مثل HUM XE1 أو CCE 111). استخرج اسم المادة فقط وتجاهل الكود تماماً.
+7. 🌟 **تنسيق الإجابة:** اجعل الإجابة جذابة بصرياً. استخدم الرموز التعبيرية (Emojis) المناسبة، ورتب المواد في قائمة نقطية جذابة (مثال: 🔹 اسم المادة).
+8. قم بتصحيح أي أخطاء إملائية ناتجة عن استخراج النصوص.
 
 CONTEXT:
 {context}
 """
 
-        response = self.groq.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": query}
-            ],
-            temperature=0.0
-        )
-        
-        raw_response = response.choices[0].message.content
+        raw_response = self._call_llm(system_prompt=system_prompt, user_prompt=query, temperature=0.0, history=history)
 
         if is_specific and department_id and "عذراً، هذه المعلومة غير متوفرة" not in raw_response:
             return self._enrich_prerequisites(raw_response, main_code, department_id)
             
+        if not is_specific:
+            # Force remove any course codes (like HUM XE1 or CCE 111) and following colon/dash
+            # Match code pattern followed by optional colon, dash, or spaces
+            scrub_pattern = re.compile(r'\b(?:[A-Za-z]{2,4}|[أ-ي]{2,4})\s*[A-Za-z0-9]{1,4}\b[\s:\-]*')
+            raw_response = scrub_pattern.sub('', raw_response)
+            
         return raw_response
+
+
 
 llm_service = LLMService()
