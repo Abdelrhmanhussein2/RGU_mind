@@ -8,7 +8,9 @@ class AcademicPlan(Base):
     __tablename__ = "academic_plans"
 
     id                          = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    program_name                = Column(String(255), unique=True, nullable=False)
+    university_id               = Column(UUID(as_uuid=True), ForeignKey("university.id", ondelete="CASCADE"), nullable=False)
+    faculty_name                = Column(String(255), nullable=False)
+    department_name             = Column(String(255), nullable=False)
     total_required_credit_hours = Column(Integer, default=0, nullable=False)
     mandatory_credit_hours      = Column(Integer, default=0, nullable=False)
     elective_credit_hours       = Column(Integer, default=0, nullable=False)

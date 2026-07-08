@@ -59,6 +59,7 @@ import {
   GRADE_OPTIONS,
   GRADE_POINTS,
   Course,
+  CourseCategory,
   TermGrades,
   getTermGrades,
   addTermGrades,
@@ -189,6 +190,16 @@ function CourseRow({
           ))}
         </SelectContent>
       </Select>
+      <Select value={course.category || "Mandatory"} onValueChange={(v) => onUpdate({ category: v as CourseCategory })}>
+        <SelectTrigger className="w-32">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Mandatory">Mandatory</SelectItem>
+          <SelectItem value="Elective">Elective</SelectItem>
+          <SelectItem value="Major">Major</SelectItem>
+        </SelectContent>
+      </Select>
       <button type="button" onClick={onRemove} className="text-gray-400 hover:text-red-600">
         <X className="w-4 h-4" />
       </button>
@@ -206,7 +217,7 @@ function CourseEditor({
   const addCourse = () =>
     onChange([
       ...courses,
-      { id: `${Date.now()}-${courses.length}`, courseName: "", creditHours: 3, grade: "A" },
+      { id: `${Date.now()}-${courses.length}`, courseName: "", creditHours: 3, grade: "A", category: "Mandatory" },
     ]);
 
   const updateCourse = (id: string, patch: Partial<Course>) =>
@@ -487,7 +498,7 @@ function AddTermDialog({
         onOpenChange(v);
       }}
     >
-      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Term</DialogTitle>
           <DialogDescription>Add courses and grades for this term.</DialogDescription>
@@ -728,7 +739,7 @@ function OverviewTab({
   const hasCourses = terms.some((t) => t.courses.length > 0);
   const gpa = calculateCumulativeGPA(terms);
   const standing = calculateStanding(gpa, hasCourses);
-  const breakdown = getRemainingBreakdown(profile, passedHours);
+  const breakdown = getRemainingBreakdown(profile, terms);
   const eligibility = checkGraduationEligibility(profile, terms);
   const progressPct =
     profile.totalRequiredCreditHours > 0

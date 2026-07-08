@@ -24,7 +24,7 @@ class LLMService:
             contents = []
             if history:
                 for msg in history:
-                    role = msg["role"]
+                    role = "model" if msg["role"] == "assistant" else msg["role"]
                     content_text = msg["content"]
                     try:
                         part = types.Part(text=content_text)

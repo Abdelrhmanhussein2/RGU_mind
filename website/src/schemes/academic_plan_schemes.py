@@ -3,7 +3,8 @@ from typing import Optional
 from uuid import UUID
 
 class AcademicPlanCreate(BaseModel):
-    programName: str
+    facultyName: str
+    departmentName: str
     totalRequiredCreditHours: int
     mandatoryCreditHours: int
     electiveCreditHours: int
@@ -13,7 +14,8 @@ class AcademicPlanCreate(BaseModel):
 
 class AcademicPlanResponse(BaseModel):
     id: UUID
-    programName: str
+    facultyName: str
+    departmentName: str
     totalRequiredCreditHours: int
     mandatoryCreditHours: int
     electiveCreditHours: int

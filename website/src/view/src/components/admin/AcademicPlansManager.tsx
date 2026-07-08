@@ -7,7 +7,8 @@ import api from "../../services/api";
 
 interface AcademicPlan {
   id: string;
-  programName: string;
+  facultyName: string;
+  departmentName: string;
   totalRequiredCreditHours: number;
   mandatoryCreditHours: number;
   electiveCreditHours: number;
@@ -20,7 +21,8 @@ export function AcademicPlansManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<AcademicPlan | null>(null);
   const [formData, setFormData] = useState({
-    programName: "",
+    facultyName: "",
+    departmentName: "",
     totalRequiredCreditHours: 0,
     mandatoryCreditHours: 0,
     electiveCreditHours: 0,
@@ -45,7 +47,8 @@ export function AcademicPlansManager() {
   const handleOpenCreate = () => {
     setEditingPlan(null);
     setFormData({
-      programName: "",
+      facultyName: "",
+      departmentName: "",
       totalRequiredCreditHours: 0,
       mandatoryCreditHours: 0,
       electiveCreditHours: 0,
@@ -59,7 +62,8 @@ export function AcademicPlansManager() {
   const handleOpenEdit = (plan: AcademicPlan) => {
     setEditingPlan(plan);
     setFormData({
-      programName: plan.programName,
+      facultyName: plan.facultyName,
+      departmentName: plan.departmentName,
       totalRequiredCreditHours: plan.totalRequiredCreditHours,
       mandatoryCreditHours: plan.mandatoryCreditHours,
       electiveCreditHours: plan.electiveCreditHours,
@@ -123,7 +127,8 @@ export function AcademicPlansManager() {
           <Card key={plan.id}>
             <CardContent className="pt-6 flex justify-between items-center">
               <div>
-                <h3 className="font-semibold text-gray-900 text-lg">{plan.programName}</h3>
+                <h3 className="font-semibold text-gray-900 text-lg">{plan.departmentName}</h3>
+                <p className="text-sm text-gray-500">{plan.facultyName}</p>
                 <div className="text-sm text-gray-500 mt-2 grid grid-cols-2 gap-x-8 gap-y-1">
                   <span>Total Hours: {plan.totalRequiredCreditHours}</span>
                   <span>Mandatory Hours: {plan.mandatoryCreditHours}</span>
@@ -164,14 +169,25 @@ export function AcademicPlansManager() {
           {error && <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{error}</div>}
 
           <div className="grid gap-4 py-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Program Name (e.g., Software Engineering)</label>
-              <input
-                type="text"
-                value={formData.programName}
-                onChange={(e) => setFormData({ ...formData, programName: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Faculty Name</label>
+                <input
+                  type="text"
+                  value={formData.facultyName}
+                  onChange={(e) => setFormData({ ...formData, facultyName: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Department Name</label>
+                <input
+                  type="text"
+                  value={formData.departmentName}
+                  onChange={(e) => setFormData({ ...formData, departmentName: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

@@ -35,7 +35,7 @@ import {
 } from "../lib/adminUniversities";
 import api from "../../services/api";
 
-import { AcademicPlansManager } from "../../components/admin/AcademicPlansManager";
+
 
 type Tab = "pending" | "approved" | "rejected" | "universities" | "academic_plans" | "settings";
 
@@ -256,7 +256,6 @@ export function AdminDashboard() {
             { id: "approved", label: "Approved", icon: CheckCircle2, count: approved.length + approvedUniversities.length },
             { id: "rejected", label: "Rejected", icon: XCircle, count: rejected.length + rejectedUniversities.length },
             { id: "universities", label: "Pending Universities", icon: Building2, count: pendingUniversities.length },
-            { id: "academic_plans", label: "Academic Plans", icon: FileText as any, count: 0 },
             { id: "settings", label: "Settings", icon: SettingsIcon },
           ].map((item) => {
             const Icon = item.icon;
@@ -460,9 +459,7 @@ export function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === "academic_plans" && (
-          <AcademicPlansManager />
-        )}
+
       </main>
 
       <Dialog open={!!viewUniversity} onOpenChange={(v) => !v && setViewUniversity(null)}>

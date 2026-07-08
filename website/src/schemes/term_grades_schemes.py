@@ -7,6 +7,7 @@ class CourseBase(BaseModel):
     courseName: str
     creditHours: int
     grade: str
+    category: str = "Mandatory"
 
 
 class CourseCreate(CourseBase):

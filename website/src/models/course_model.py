@@ -13,6 +13,7 @@ class Course(Base):
     course_name  = Column(String(255), nullable=False)
     credit_hours = Column(Integer, nullable=False)
     grade        = Column(String(10), nullable=False)  # A+, A, A-, B+, etc.
+    category     = Column(String(50), nullable=False, default="Mandatory")
 
     # Relationship to term model
     term = relationship("TermGrades", back_populates="courses")

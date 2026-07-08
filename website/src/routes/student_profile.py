@@ -8,6 +8,7 @@ from sqlalchemy import func
 from helpers.security import get_current_student
 from models.user_model import Student
 from models.academic_plan_model import AcademicPlan
+from models.university_model import University
 from schemes.student_profile_schemes import StudentProfileRequest, StudentProfileResponse
 from services.student_profile_service import student_profile_service
 
@@ -40,7 +41,10 @@ async def create_profile(
             curriculum_pdf_path=None,
             db=db
         )
-        plan = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(profile.department)).first()
+        plan = db.query(AcademicPlan).join(University, AcademicPlan.university_id == University.id).filter(
+            func.lower(AcademicPlan.department_name) == func.lower(profile.department),
+            func.lower(University.name) == func.lower(profile.university)
+        ).first()
         return StudentProfileResponse(
             fullName=student.name,
             studentId=profile.student_id_code,
@@ -78,7 +82,10 @@ async def get_profile(
             expectedGraduationYear=0
         )
 
-    plan = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(profile.department)).first()
+    plan = db.query(AcademicPlan).join(University, AcademicPlan.university_id == University.id).filter(
+        func.lower(AcademicPlan.department_name) == func.lower(profile.department),
+        func.lower(University.name) == func.lower(profile.university)
+    ).first()
 
     return StudentProfileResponse(
         fullName=student.name,

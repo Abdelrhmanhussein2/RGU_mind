@@ -4,6 +4,7 @@ import { Upload, FileText, Settings, CheckCircle, Clock, Brain, LogOut, Home } f
 import { getDocuments, uploadDocuments, resetRegulation } from "../../services/documentService";
 import { logout, updateUniversityProfile } from "../../services/authService";
 import { useAuth } from "../../store/authStore";
+import { AcademicPlansManager } from "../../components/admin/AcademicPlansManager";
 
 interface Document {
   id: string;
@@ -15,7 +16,7 @@ interface Document {
 export function UniversityDashboard() {
   const navigate = useNavigate();
   const { state, logout: authLogout } = useAuth();
-  const [activeTab, setActiveTab] = useState<"upload" | "documents" | "settings">("upload");
+  const [activeTab, setActiveTab] = useState<"upload" | "documents" | "academic_plans" | "settings">("upload");
   const [documents, setDocuments] = useState<Document[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -212,6 +213,18 @@ export function UniversityDashboard() {
           </button>
 
           <button
+            onClick={() => setActiveTab("academic_plans")}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              activeTab === "academic_plans"
+                ? "bg-indigo-50 text-indigo-600"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <FileText className="w-5 h-5" />
+            <span className="font-medium">Academic Plans</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("settings")}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
               activeTab === "settings"
@@ -248,11 +261,13 @@ export function UniversityDashboard() {
           <h1 className="text-3xl font-semibold text-gray-900">
             {activeTab === "upload" && "Upload Regulations"}
             {activeTab === "documents" && "Documents"}
+            {activeTab === "academic_plans" && "Academic Plans"}
             {activeTab === "settings" && "Settings"}
           </h1>
           <p className="text-gray-600 mt-1">
             {activeTab === "upload" && "Upload your academic regulations for AI processing"}
             {activeTab === "documents" && "Manage your uploaded documents"}
+            {activeTab === "academic_plans" && "Manage academic plans for your faculties and departments"}
             {activeTab === "settings" && "Configure your university settings"}
           </p>
         </header>
@@ -478,6 +493,10 @@ export function UniversityDashboard() {
                 </div>
               </div>
             </div>
+          )}
+
+          {activeTab === "academic_plans" && (
+            <AcademicPlansManager />
           )}
         </div>
       </main>

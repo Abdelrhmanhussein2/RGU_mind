@@ -24,7 +24,8 @@ class AcademicPlanController:
         if not plan: return None
         return AcademicPlanResponse(
             id=plan.id,
-            programName=plan.program_name,
+            facultyName=plan.faculty_name,
+            departmentName=plan.department_name,
             totalRequiredCreditHours=plan.total_required_credit_hours,
             mandatoryCreditHours=plan.mandatory_credit_hours,
             electiveCreditHours=plan.elective_credit_hours,
@@ -33,29 +34,37 @@ class AcademicPlanController:
             curriculumPdfPath=plan.curriculum_pdf_path
         )
 
-    def get_all(self, db: Session):
-        plans = db.query(AcademicPlan).all()
+    def get_all(self, university_id: UUID, db: Session):
+        plans = db.query(AcademicPlan).filter(AcademicPlan.university_id == university_id).all()
         return [self._to_response(p) for p in plans]
 
-    def get_by_program(self, program_name: str, db: Session):
+    def get_by_department(self, department_name: str, university_id: UUID, db: Session):
         from sqlalchemy import func
-        plan = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(program_name)).first()
+        plan = db.query(AcademicPlan).filter(
+            func.lower(AcademicPlan.department_name) == func.lower(department_name),
+            AcademicPlan.university_id == university_id
+        ).first()
         if not plan:
             raise HTTPException(status_code=404, detail="Academic plan not found")
         return self._to_response(plan)
 
-    def create_plan(self, req: AcademicPlanCreate, db: Session):
+    def create_plan(self, university_id: UUID, req: AcademicPlanCreate, db: Session):
         from sqlalchemy import func
-        existing = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(req.programName)).first()
+        existing = db.query(AcademicPlan).filter(
+            func.lower(AcademicPlan.department_name) == func.lower(req.departmentName),
+            AcademicPlan.university_id == university_id
+        ).first()
         if existing:
-            raise HTTPException(status_code=400, detail="Academic plan for this program already exists")
+            raise HTTPException(status_code=400, detail="Academic plan for this department already exists")
 
         pdf_path = None
         if req.curriculumPdfName and req.curriculumPdfBase64:
             pdf_path = save_base64_file(req.curriculumPdfBase64, req.curriculumPdfName)
 
         plan = AcademicPlan(
-            program_name=req.programName,
+            university_id=university_id,
+            faculty_name=req.facultyName,
+            department_name=req.departmentName,
             total_required_credit_hours=req.totalRequiredCreditHours,
             mandatory_credit_hours=req.mandatoryCreditHours,
             elective_credit_hours=req.electiveCreditHours,
@@ -68,18 +77,23 @@ class AcademicPlanController:
         db.refresh(plan)
         return self._to_response(plan)
 
-    def update_plan(self, plan_id: UUID, req: AcademicPlanCreate, db: Session):
+    def update_plan(self, plan_id: UUID, university_id: UUID, req: AcademicPlanCreate, db: Session):
         from sqlalchemy import func
-        plan = db.query(AcademicPlan).filter(AcademicPlan.id == plan_id).first()
+        plan = db.query(AcademicPlan).filter(AcademicPlan.id == plan_id, AcademicPlan.university_id == university_id).first()
         if not plan:
             raise HTTPException(status_code=404, detail="Academic plan not found")
 
         # Check name conflict
-        existing = db.query(AcademicPlan).filter(func.lower(AcademicPlan.program_name) == func.lower(req.programName), AcademicPlan.id != plan_id).first()
+        existing = db.query(AcademicPlan).filter(
+            func.lower(AcademicPlan.department_name) == func.lower(req.departmentName),
+            AcademicPlan.university_id == university_id,
+            AcademicPlan.id != plan_id
+        ).first()
         if existing:
-            raise HTTPException(status_code=400, detail="Another plan with this program name already exists")
+            raise HTTPException(status_code=400, detail="Another plan with this department name already exists")
 
-        plan.program_name = req.programName
+        plan.faculty_name = req.facultyName
+        plan.department_name = req.departmentName
         plan.total_required_credit_hours = req.totalRequiredCreditHours
         plan.mandatory_credit_hours = req.mandatoryCreditHours
         plan.elective_credit_hours = req.electiveCreditHours
@@ -94,8 +108,8 @@ class AcademicPlanController:
         db.refresh(plan)
         return self._to_response(plan)
 
-    def delete_plan(self, plan_id: UUID, db: Session):
-        plan = db.query(AcademicPlan).filter(AcademicPlan.id == plan_id).first()
+    def delete_plan(self, plan_id: UUID, university_id: UUID, db: Session):
+        plan = db.query(AcademicPlan).filter(AcademicPlan.id == plan_id, AcademicPlan.university_id == university_id).first()
         if not plan:
             raise HTTPException(status_code=404, detail="Academic plan not found")
         db.delete(plan)
