@@ -40,4 +40,69 @@ class AdminService:
         db.refresh(university)
         return university
 
+    def get_universities(self, db: Session):
+        return db.query(University).all()
+
+    def login_admin(self, email: str, db: Session):
+        return db.query(Admin).filter(Admin.email == email).first()
+
+    def get_admin_by_email(self, email: str, db: Session):
+        return db.query(Admin).filter(Admin.email == email).first()
+
+    def update_profile(self, admin: Admin, name: str, email: str, db: Session):
+        admin.name = name
+        admin.email = email
+        db.commit()
+        db.refresh(admin)
+        return admin
+
+    def get_pending_regulations(self, db: Session):
+        from models.regulation_model import Regulation
+        from models.document_model import Document
+        from models.department_model import Department
+        from models.faculty_model import Faculty
+        query = db.query(
+            Regulation.id,
+            University.name.label("university_name"),
+            Document.filename.label("document_name"),
+            Document.uploaded_at.label("upload_date"),
+            Document.filename.label("file_type"),
+            Document.file_path.label("file_path"),
+            Regulation.status,
+            Regulation.rejection_reason,
+            Regulation.reviewed_at
+        ).join(
+            Department, Regulation.department_id == Department.id
+        ).join(
+            Faculty, Department.faculty_id == Faculty.id
+        ).join(
+            University, Faculty.university_id == University.id
+        ).outerjoin(
+            Document, Document.regulation_id == Regulation.id
+        )
+        return query.all()
+
+    def approve_regulation(self, regulation_id: str, db: Session):
+        from models.regulation_model import Regulation
+        from datetime import datetime
+        regulation = db.query(Regulation).filter(Regulation.id == regulation_id).first()
+        if not regulation:
+            raise ValueError("Regulation not found")
+
+        regulation.status = "active"
+        regulation.reviewed_at = datetime.utcnow()
+        db.commit()
+
+    def reject_regulation(self, regulation_id: str, reason: str, db: Session):
+        from models.regulation_model import Regulation
+        from datetime import datetime
+        regulation = db.query(Regulation).filter(Regulation.id == regulation_id).first()
+        if not regulation:
+            raise ValueError("Regulation not found")
+
+        regulation.status = "archived"
+        regulation.rejection_reason = reason
+        regulation.reviewed_at = datetime.utcnow()
+        db.commit()
+
 admin_service = AdminService()

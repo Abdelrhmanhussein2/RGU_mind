@@ -1,58 +1,18 @@
 from sqlalchemy.orm import Session
-from fastapi import FastAPI, APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from helpers.config import get_db
 from fastapi.encoders import jsonable_encoder
-from schemes.retreival_schemes import retrievalRequest, retrievalResponse, retrievalListResponse, augmentedListResponse
+from schemes.retreival_schemes import retrievalRequest, augmentedListResponse
 from controllers.answer_controller import answer_controllerr
 from helpers.security import get_current_user
-from models.student_profile_model import StudentProfile
-from models.department_model import Department
-
 
 rerival_router=APIRouter()
 
-# @rerival_router.post("/search",response_model=retrievalListResponse)
-# def retrieve_router(request:retrievalRequest, db:Session=Depends(get_db)):
-#     response= retrievall_controller.retrieval_controller(request,db)
-#     return JSONResponse(
-#                status_code=status.HTTP_200_OK,
-#                content={"data": jsonable_encoder(response), "message": "Success"}
-#     )
-
 @rerival_router.post("/answer",response_model=augmentedListResponse)
 def answer_router(request:retrievalRequest, db:Session=Depends(get_db), current_user: dict = Depends(get_current_user)):
-    if not request.department_id:
-        user = current_user.get("user")
-        role = current_user.get("role")
-        
-        if role == "student":
-            profile = db.query(StudentProfile).filter(StudentProfile.student_id == user.id).first()
-            if not profile:
-                raise HTTPException(status_code=400, detail="Student profile not found. Cannot determine department.")
-                
-            from models.faculty_model import Faculty
-            from sqlalchemy import func
-            department = db.query(Department).join(Faculty, Department.faculty_id == Faculty.id).filter(
-                func.lower(Faculty.name) == func.lower(profile.faculty),
-                func.lower(Department.name) == func.lower(profile.department)
-            ).first()
-            
-            if not department:
-                # Fallback: Match by department name only
-                department = db.query(Department).filter(
-                    func.lower(Department.name) == func.lower(profile.department)
-                ).first()
-                
-            if not department:
-                raise HTTPException(status_code=400, detail=f"Department '{profile.department}' not found for the student's profile.")
-                
-            request.department_id = department.id
-        else:
-            raise HTTPException(status_code=400, detail="department_id is required for non-student users.")
-
-    response = answer_controllerr.answer(request,db, current_user)
+    response = answer_controllerr.answer(request, db, current_user)
     return JSONResponse(
                status_code=status.HTTP_200_OK,
                content={"data": jsonable_encoder(response), "message": "Success"}
-    )
+    )

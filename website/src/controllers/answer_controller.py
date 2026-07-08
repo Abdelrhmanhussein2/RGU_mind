@@ -7,7 +7,40 @@ from schemes.retreival_schemes import retrievalRequest, retrievalResponse, augme
 class answer_controller:
     def answer(self,request:retrievalRequest, db:Session, current_user: dict = None):
         from models.chat_model import ChatSession, ChatMessage
+        from models.student_profile_model import StudentProfile
+        from models.department_model import Department
+        from models.faculty_model import Faculty
+        from sqlalchemy import func
         import uuid
+        from fastapi import HTTPException
+
+        if not request.department_id and current_user:
+            user = current_user.get("user")
+            role = current_user.get("role")
+            
+            if role == "student":
+                profile = db.query(StudentProfile).filter(StudentProfile.student_id == user.id).first()
+                if not profile:
+                    raise HTTPException(status_code=400, detail="Student profile not found. Cannot determine department.")
+                    
+                department = db.query(Department).join(Faculty, Department.faculty_id == Faculty.id).filter(
+                    func.lower(Faculty.name) == func.lower(profile.faculty),
+                    func.lower(Department.name) == func.lower(profile.department)
+                ).first()
+                
+                if not department:
+                    # Fallback: Match by department name only
+                    department = db.query(Department).filter(
+                        func.lower(Department.name) == func.lower(profile.department)
+                    ).first()
+                    
+                if not department:
+                    raise HTTPException(status_code=400, detail=f"Department '{profile.department}' not found for the student's profile.")
+                    
+                request.department_id = department.id
+            else:
+                raise HTTPException(status_code=400, detail="department_id is required for non-student users.")
+
 
         original_query = request.query
         

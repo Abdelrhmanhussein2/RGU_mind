@@ -6,9 +6,19 @@ from models.user_model import Student
 from schemes.student_profile_schemes import StudentProfileRequest
 
 
+from models.academic_plan_model import AcademicPlan
+from models.university_model import University
+from sqlalchemy import func
+
 class StudentProfileService:
     def get_profile(self, student_id: UUID, db: Session) -> Optional[StudentProfile]:
         return db.query(StudentProfile).filter(StudentProfile.student_id == student_id).first()
+
+    def get_academic_plan(self, department: str, university_name: str, db: Session) -> Optional[AcademicPlan]:
+        return db.query(AcademicPlan).join(University, AcademicPlan.university_id == University.id).filter(
+            func.lower(AcademicPlan.department_name) == func.lower(department),
+            func.lower(University.name) == func.lower(university_name)
+        ).first()
 
     def create_or_update_profile(
         self,

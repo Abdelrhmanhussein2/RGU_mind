@@ -498,7 +498,7 @@ function AddTermDialog({
         onOpenChange(v);
       }}
     >
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Term</DialogTitle>
           <DialogDescription>Add courses and grades for this term.</DialogDescription>
