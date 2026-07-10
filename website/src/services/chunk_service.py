@@ -46,7 +46,7 @@ YEAR_PATTERN = re.compile(
     re.UNICODE,
 )
 
-CODE_PATTERN = re.compile(r'[A-Z]{2,4}\s*\d{3,4}')
+CODE_PATTERN = re.compile(r'[A-Z]{2,4}\s*(?:\d{3,4}|[Xx×]\d{2,3})')
 
 IGNORED_LINE_PATTERNS = [
     re.compile(r'Page\s*\d+', re.IGNORECASE),
@@ -115,7 +115,7 @@ class ChunkService:
 
     # ── Study-plan extraction ─────────────────────────────────────────────────
 
-    def _extract_study_plan(self, page, raw_text: str, repeated: set) -> list:
+    def _extract_study_plan(self, page, raw_text: str, repeated: set, code_to_name: dict) -> list:
         header_lines = []
         for line in raw_text.splitlines():
             clean = line.strip()
@@ -156,7 +156,14 @@ class ChunkService:
                     main_name = " ".join(names_found)
                     credits = credits_found[0] if credits_found else "غير محدد"
                     prereqs = [c for c in codes_found if c != main_code]
-                    prereq_str = ", ".join(prereqs) if prereqs else "لا يوجد متطلب سابق"
+                    prereq_names = []
+                    for c in prereqs:
+                        name = code_to_name.get(c)
+                        if name:
+                            prereq_names.append(f"{c} ({name})")
+                        else:
+                            prereq_names.append(c)
+                    prereq_str = ", ".join(prereq_names) if prereq_names else "لا يوجد متطلب سابق"
                     
                     desc_text = f"- مادة: {main_name} | كود: {main_code} | الساعات المعتمدة: {credits} | متطلب سابق: {prereq_str}"
                     rows.append(desc_text)
@@ -230,6 +237,20 @@ class ChunkService:
         raw_page_texts = [page.get_text("text") for page in doc]
         repeated = self._find_repeated_lines(raw_page_texts)
 
+        # Pass 1.5: build code to name mapping across all pages
+        code_to_name = {}
+        for page in doc:
+            for tab in page.find_tables():
+                data = tab.extract()
+                if not data:
+                    continue
+                for row in data:
+                    clean_row = [self.fix_arabic(str(c)) for c in row if c]
+                    codes_found = [c for c in clean_row if CODE_PATTERN.search(c)]
+                    names_found = [c for c in clean_row if len(c) > 4 and not CODE_PATTERN.search(c) and not c.strip().isdigit()]
+                    if codes_found and names_found:
+                        code_to_name[codes_found[0]] = " ".join(names_found)
+
         # Pass 2: extract per page
         for page_num, page in enumerate(doc):
             raw_text = raw_page_texts[page_num]
@@ -237,7 +258,7 @@ class ChunkService:
             page_type = self._detect_page_type(raw_text, tables_raw)
 
             if page_type == "study_plan":
-                texts = self._extract_study_plan(page, raw_text, repeated)
+                texts = self._extract_study_plan(page, raw_text, repeated, code_to_name)
                 chunk_type = "study_plan"
             elif page_type == "course_description":
                 texts = self._extract_course_descriptions(page)
